@@ -1,0 +1,2 @@
+* About
+This BuildRoot repo is based on this instructions.
