@@ -1,2 +1,5 @@
 * About
-This BuildRoot repo is based on this instructions.
+This BuildRoot repo is based on instructions from the Olimex [[https://www.olimex.com/wiki/Build_Bootable_SD_Card_with_Debian][wiki]].
+
+It is for for my personal use.
+
