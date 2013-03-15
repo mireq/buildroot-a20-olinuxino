@@ -4,4 +4,13 @@ This BuildRoot repo is based on instructions from the Olimex [[https://www.olime
 It is for for my personal use.
 
 * Instructions
-I didn't upload configuration yet.
+I've just uploaded the source code that builds the image.
+
+Try this command to achive it:
+
+#+begin_src sh
+make a13_olinuxino_defconfig
+make
+#+end_src
+
+At the end of the compilation process you will see instructions to create sd image.
