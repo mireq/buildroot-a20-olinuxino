@@ -3,3 +3,5 @@ This BuildRoot repo is based on instructions from the Olimex [[https://www.olime
 
 It is for for my personal use.
 
+* Instructions
+I didn't upload configuration yet.
