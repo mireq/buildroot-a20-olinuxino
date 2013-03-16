@@ -8,7 +8,7 @@ echo ===
 echo
 echo To create sd image type command:
 echo
-echo sudo $BOARD_DIR/make-sdimg.sh $BINARIES_DIR/rootfs.tar 50 $BINARIES_DIR
+echo sudo $BOARD_DIR/make-sdimg.sh $BINARIES_DIR/rootfs.tar 60 $BINARIES_DIR
 echo 
 echo ===
 
