@@ -1,0 +1,13 @@
+config BR2_PACKAGE_PICOLISP
+    bool "picolisp"
+	depends on BR2_LARGEFILE
+	depends on BR2_INET_IPV6
+    help
+      Picolisp is "Scalpel of Programming": Sharp, accurate, small and
+      lightweight, but also dangerous in the hand of the
+      inexperienced.
+
+      http://picolisp.com/
+
+comment "picolisp requires a toolchain with LARGEFILE, IPV6"
+	depends on !BR2_LARGEFILE || !BR2_INET_IPV6
