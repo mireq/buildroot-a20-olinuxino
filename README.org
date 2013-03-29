@@ -1,11 +1,9 @@
 * About
 This BuildRoot repo is based on instructions from the Olimex [[https://www.olimex.com/wiki/Build_Bootable_SD_Card_with_Debian][wiki]].
 
-It is for for my personal use.
+It is for my personal use.
 
 * Instructions
-I've just uploaded the source code that builds the image and I'm testing it right now.
-
 Try this command to achive it:
 
 #+BEGIN_SRC sh
@@ -14,3 +12,5 @@ Try this command to achive it:
 #+END_SRC
 
 At the end of the compilation process you will see instructions to create sd image.
+
+Please, if you find it useful try to use or build it.
