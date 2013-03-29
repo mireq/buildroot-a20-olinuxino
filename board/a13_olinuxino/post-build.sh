@@ -19,3 +19,8 @@ then
     cp $BINARIES_DIR/sunxi-spl.bin $BOOT
 
 fi
+
+if [ -e $BOARD_DIR/wpa_supplicant.conf ];
+then
+    cp $BOARD_DIR/wpa_supplicant.conf $TARGET_DIR/etc/wpa_supplicant.conf
+fi
