@@ -14,3 +14,8 @@ Try this command to achive it:
 At the end of the compilation process you will see instructions to create sd image.
 
 Please, if you find it useful try to use or build it.
+
+* Why it may be useful for you
+This is original buildroot besides that, it contains:
+ - script to make sd card image
+ - package to build OLIMEX UEXT modules for A13-OLinuXino
