@@ -826,4 +826,8 @@ source "package/vim/Config.in"
 endif
 endmenu
 
+if BR2_cortex_a8
+source "package/a13-olinuxino-software/Config.in"
+endif
+
 endmenu
