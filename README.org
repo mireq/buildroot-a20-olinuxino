@@ -19,3 +19,4 @@ Please, if you find it useful try to use or build it.
 This is original buildroot besides that, it contains:
  - script to make sd card image
  - package to build OLIMEX UEXT modules for A13-OLinuXino
+ - other new packages (picolisp)
