@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # busybox
 #
-#############################################################
+################################################################################
 
 ifeq ($(BR2_PACKAGE_BUSYBOX_SNAPSHOT),y)
 BUSYBOX_VERSION = snapshot
@@ -105,10 +105,6 @@ endif
 ifeq ($(BR2_PREFER_STATIC_LIB),y)
 define BUSYBOX_PREFER_STATIC
 	$(call KCONFIG_ENABLE_OPT,CONFIG_STATIC,$(BUSYBOX_BUILD_CONFIG))
-endef
-else
-define BUSYBOX_PREFER_STATIC
-	$(call KCONFIG_DISABLE_OPT,CONFIG_STATIC,$(BUSYBOX_BUILD_CONFIG))
 endef
 endif
 

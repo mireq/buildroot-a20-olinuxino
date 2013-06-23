@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # bind
 #
-#############################################################
+################################################################################
 
 BIND_VERSION = 9.6-ESV-R8
 BIND_SITE = ftp://ftp.isc.org/isc/bind9/$(BIND_VERSION)
@@ -30,7 +30,7 @@ endif
 
 ifeq ($(BR2_PACKAGE_OPENSSL),y)
 	BIND_DEPENDENCIES += openssl
-	BIND_CONF_OPT += --with-openssl=$(STAGING_DIR)/usr
+	BIND_CONF_OPT += --with-openssl=$(STAGING_DIR)/usr LIBS="-lz"
 else
 	BIND_CONF_OPT += --with-openssl=no
 endif

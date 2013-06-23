@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
 # python3
 #
-#############################################################
+################################################################################
+
 PYTHON3_VERSION_MAJOR = 3.3
 PYTHON3_VERSION       = $(PYTHON3_VERSION_MAJOR).0
 PYTHON3_SOURCE        = Python-$(PYTHON3_VERSION).tar.bz2
@@ -130,6 +131,7 @@ PYTHON3_POST_INSTALL_STAGING_HOOKS += PYTHON3_FIXUP_LIBDIR
 #
 define PYTHON3_REMOVE_DEVFILES
 	rm -f $(TARGET_DIR)/usr/bin/python$(PYTHON3_VERSION_MAJOR)-config
+	rm -f $(TARGET_DIR)/usr/bin/python$(PYTHON3_VERSION_MAJOR)m-config
 	rm -f $(TARGET_DIR)/usr/bin/python3-config
 endef
 

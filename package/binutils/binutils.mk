@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # binutils
 #
-#############################################################
+################################################################################
 
 # Version is set when using buildroot toolchain.
 # If not, we do like other packages
@@ -25,6 +25,9 @@ endif
 BINUTILS_SITE = $(BR2_GNU_MIRROR)/binutils
 ifeq ($(ARCH),avr32)
 BINUTILS_SITE = ftp://www.at91.com/pub/buildroot
+endif
+ifeq ($(BR2_arc),y)
+BINUTILS_SITE = $(BR2_ARC_SITE)
 endif
 BINUTILS_EXTRA_CONFIG_OPTIONS = $(call qstrip,$(BR2_BINUTILS_EXTRA_CONFIG_OPTIONS))
 BINUTILS_INSTALL_STAGING = YES
@@ -52,7 +55,11 @@ HOST_BINUTILS_CONF_OPT = --disable-multilib --disable-werror \
 			--with-sysroot=$(STAGING_DIR) \
 			$(BINUTILS_EXTRA_CONFIG_OPTIONS)
 
+ifeq ($(BINUTILS_VERSION),2.19-arc)
+HOST_BINUTILS_DEPENDENCIES = host-flex host-bison
+else
 HOST_BINUTILS_DEPENDENCIES =
+endif
 
 # We just want libbfd and libiberty, not the full-blown binutils in staging
 define BINUTILS_INSTALL_STAGING_CMDS
@@ -74,6 +81,7 @@ define BINUTILS_XTENSA_PRE_PATCH
 	tar xf $(BR2_XTENSA_OVERLAY_DIR)/xtensa_$(XTENSA_CORE_NAME).tar \
 		-C $(@D) --strip-components=1 binutils
 endef
+BINUTILS_PRE_PATCH_HOOKS += BINUTILS_XTENSA_PRE_PATCH
 HOST_BINUTILS_PRE_PATCH_HOOKS += BINUTILS_XTENSA_PRE_PATCH
 endif
 

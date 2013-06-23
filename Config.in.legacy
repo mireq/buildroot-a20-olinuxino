@@ -41,8 +41,67 @@ comment "will fail.                                          "
 endif
 
 #
+# Legacy options since 2013.08
+#
+
+config BR2_PACKAGE_DOSFSTOOLS_DOSFSCK
+	bool "dosfstools dosfsck renamed to fsck.fat"
+	select BR2_LEGACY
+	select BR2_PACKAGE_DOSFSTOOLS_FSCK_FAT
+	help
+	  dosfsck was renamed upstream to fsck.fat for consistency.
+
+config BR2_PACKAGE_DOSFSTOOLS_DOSFSLABEL
+	bool "dosfstools dosfslabel renamed to fatlabel"
+	select BR2_LEGACY
+	select BR2_PACKAGE_DOSFSTOOLS_FATLABEL
+	help
+	  doslabel was renamed upstream to fatlabel for consistency.
+
+config BR2_PACKAGE_DOSFSTOOLS_MKDOSFS
+	bool "dosfstools mkdosfs renamed to mkfs.fat"
+	select BR2_LEGACY
+	select BR2_PACKAGE_DOSFSTOOLS_MKFS_FAT
+	help
+	  mkdosfs was renamed upstream to mkfs.fat for consistency.
+
+#
+# Legacy options since 2013.05
+#
+
+config BR2_PACKAGE_LINUX_FIRMWARE_RTL_8192
+	bool "Realtek 8192 replaced by Realtek 81xx"
+	select BR2_LEGACY
+	select BR2_PACKAGE_LINUX_FIRMWARE_RTL_81XX
+	help
+	  Now covers the whole Realtek 81xx familly: 8188/8192.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_RTL_8712
+	bool "Realtek 8712 replaced by Realtek 87xx"
+	select BR2_LEGACY
+	select BR2_PACKAGE_LINUX_FIRMWARE_RTL_87XX
+	help
+	  Now covers the whole Realtek 87xx familly: 8712/8723.
+
+#
 # Legacy options since 2013.02
 #
+
+config BR2_sa110
+	bool "sa110 ARM target switched to strongarm"
+	select BR2_LEGACY
+	select BR2_strongarm
+	help
+	  The SA110 is the same as a generic StrongARM, it just differs
+	  in speed, peripherals and cache.
+
+config BR2_sa1100
+	bool "sa1100 ARM target switched to strongarm"
+	select BR2_LEGACY
+	select BR2_strongarm
+	help
+	  The SA1100 is the same as a generic StrongARM, it just differs
+	  in speed, peripherals and cache.
 
 config BR2_PACKAGE_GDISK
 	bool "gdisk has been replaced by gptfdisk"
@@ -66,6 +125,31 @@ config BR2_PACKAGE_GDISK_SGDISK
 	select BR2_PACKAGE_GPTFDISK_SGDISK
 	help
 	  The option has been renamed BR2_PACKAGE_GPTFDISK_SGDISK.
+
+config BR2_PACKAGE_GDB_HOST
+	bool "gdb for the host option has been renamed"
+	select BR2_PACKAGE_HOST_GDB
+	select BR2_LEGACY
+	help
+	  Due to the conversion of gdb to the package infrastructure,
+	  the BR2_PACKAGE_GDB_HOST option has been renamed
+	  BR2_PACKAGE_HOST_GDB.
+
+config BR2_PACKAGE_DIRECTB_DITHER_RGB16
+	bool "DirectFB RGB16 dithering option has been renamed"
+	select BR2_PACKAGE_DIRECTFB_DITHER_RGB16
+	select BR2_LEGACY
+	help
+	  The option has been renamed
+	  BR2_PACKAGE_DIRECTFB_DITHER_RGB16.
+
+config BR2_PACKAGE_DIRECTB_TESTS
+	bool "DirectFB Tests option has been renamed"
+	select BR2_PACKAGE_DIRECTFB_TESTS
+	select BR2_LEGACY
+	help
+	  The option has been renamed
+	  BR2_PACKAGE_DIRECTFB_TESTS.
 
 #
 # Legacy options since 2012.11
@@ -99,6 +183,7 @@ config BR2_PACKAGE_PTHREAD_STUBS
 	bool "pthread-stubs option has been renamed"
 	select BR2_LEGACY
 	select BR2_PACKAGE_XLIB_LIBPTHREAD_STUBS
+	depends on BR2_PACKAGE_XORG7
 	help
 	  For consistency reason, the pthread-stubs package has been
 	  renamed to xlib_libpthread-stubs.
@@ -129,5 +214,15 @@ config BR2_PACKAGE_INPUT_TOOLS_EVTEST
 	select BR2_PACKAGE_EVTEST
 	help
 	  The evtest program from input-tools is now a separate package.
+
+config BR2_BFIN_FDPIC
+	bool "BR2_BFIN_FDPIC is now BR2_BINFMT_FDPIC"
+	select BR2_BINFMT_FDPIC
+	select BR2_LEGACY
+
+config BR2_BFIN_FLAT
+	bool "BR2_BFIN_FLAT is now BR2_BINFMT_FLAT"
+	select BR2_BINFMT_FLAT
+	select BR2_LEGACY
 
 endmenu

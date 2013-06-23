@@ -1,13 +1,13 @@
-#############################################################
+################################################################################
 #
 # rpi-userland
 #
-#############################################################
+################################################################################
 
-RPI_USERLAND_VERSION = 5e9a740a88a889dfc8a18bb1b00c17e5dd9d0108
-RPI_USERLAND_SITE = http://github.com/raspberrypi/userland/tarball/master
+RPI_USERLAND_VERSION = 986774edf7c91a8a91d59abadbdb0b34b5a387dc
+RPI_USERLAND_SITE = http://github.com/raspberrypi/userland/tarball/$(RPI_USERLAND_VERSION)
 RPI_USERLAND_LICENSE = BSD-3c
-RPI_USERLAND_LICENSE_FILE = LICENCE
+RPI_USERLAND_LICENSE_FILES = LICENCE
 RPI_USERLAND_INSTALL_STAGING = YES
 RPI_USERLAND_CONF_OPT = -DVMCS_INSTALL_PREFIX=/usr
 

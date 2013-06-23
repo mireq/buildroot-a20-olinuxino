@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
-# OpenCV (Open Source Computer Vision)
+# opencv
 #
-#############################################################
+################################################################################
+
 OPENCV_VERSION = 2.4.2
 OPENCV_SITE    = http://downloads.sourceforge.net/project/opencvlibrary/opencv-unix/$(OPENCV_VERSION)
 OPENCV_SOURCE  = OpenCV-$(OPENCV_VERSION).tar.bz2

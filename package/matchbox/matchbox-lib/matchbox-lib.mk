@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # MatchBox LIB
 #
-#############################################################
+################################################################################
 
 MATCHBOX_LIB_VERSION = 1.9
 MATCHBOX_LIB_SOURCE = libmatchbox-$(MATCHBOX_LIB_VERSION).tar.bz2
@@ -20,7 +20,7 @@ endef
 
 MATCHBOX_LIB_POST_INSTALL_STAGING_HOOKS += MATCHBOX_LIB_POST_INSTALL_FIXES
 
-#############################################################
+################################################################################
 
 ifeq ($(BR2_PACKAGE_X11R7_LIBXCOMPOSITE),y)
 ifeq ($(BR2_PACKAGE_X11R7_LIBXPM),y)
@@ -42,7 +42,7 @@ else
   MATCHBOX_LIB_CONF_OPT+=--disable-png
 endif
 
-ifeq ($(BR2_PACKAGE_PANGO),y)
+ifeq ($(BR2_PACKAGE_PANGO)$(BR2_PACKAGE_XLIB_LIBXFT)$(BR2_PACKAGE_XLIB_LIBXRENDER),yyy)
   MATCHBOX_LIB_CONF_OPT+=--enable-pango
   MATCHBOX_LIB_DEPENDENCIES+=pango
 else
@@ -56,6 +56,6 @@ else
   MATCHBOX_LIB_CONF_OPT+=--disable-xft
 endif
 
-#############################################################
+################################################################################
 
 $(eval $(autotools-package))

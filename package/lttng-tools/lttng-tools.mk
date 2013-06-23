@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
-# LTTng-Tools: the trace control client
+# LTTng-Tools
 #
-#############################################################
+################################################################################
+
 LTTNG_TOOLS_VERSION = 2.1.1
 LTTNG_TOOLS_SITE    = http://lttng.org/files/lttng-tools/
 LTTNG_TOOLS_SOURCE  = lttng-tools-$(LTTNG_TOOLS_VERSION).tar.bz2

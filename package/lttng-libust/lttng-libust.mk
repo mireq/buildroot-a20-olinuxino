@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
-# LTTng-UST: the userspace tracing library
+# LTTng-UST
 #
-#############################################################
+################################################################################
+
 LTTNG_LIBUST_SITE    = http://lttng.org/files/lttng-ust/
 LTTNG_LIBUST_VERSION = 2.1.1
 LTTNG_LIBUST_SOURCE  = lttng-ust-$(LTTNG_LIBUST_VERSION).tar.bz2

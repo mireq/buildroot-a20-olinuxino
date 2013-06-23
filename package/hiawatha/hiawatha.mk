@@ -1,4 +1,10 @@
-HIAWATHA_VERSION = 8.8
+################################################################################
+#
+# hiawatha
+#
+################################################################################
+
+HIAWATHA_VERSION = 9.1
 HIAWATHA_SITE = http://www.hiawatha-webserver.org/files
 HIAWATHA_LICENSE = GPLv2
 HIAWATHA_LICENSE_FILES = LICENSE

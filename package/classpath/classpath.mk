@@ -1,3 +1,9 @@
+################################################################################
+#
+# classpath
+#
+################################################################################
+
 CLASSPATH_VERSION = 0.98
 CLASSPATH_SITE = $(BR2_GNU_MIRROR)/classpath
 CLASSPATH_CONF_OPT = \
@@ -7,6 +13,10 @@ CLASSPATH_CONF_OPT = \
 	--disable-Werror \
 	--disable-gconf-peer \
 	--disable-tools
+
+# classpath assumes qt runs on top of X11, but we
+# don't support qt4 on X11
+CLASSPATH_CONF_OPT += --disable-qt-peer
 
 CLASSPATH_DEPENDENCIES = host-pkgconf
 
@@ -37,13 +47,6 @@ endif
 
 else
 CLASSPATH_CONF_OPT += --disable-gtk-peer --disable-gstreamer-peer
-endif
-
-ifeq ($(BR2_PACKAGE_QT),y)
-CLASSPATH_CONF_OPT += --enable-qt-peer
-CLASSPATH_DEPENDENCIES += qt
-else
-CLASSPATH_CONF_OPT += --disable-qt-peer
 endif
 
 ifeq ($(BR2_PACKAGE_LIBXML2)$(BR2_PACKAGE_LIBXSLT),yy)
