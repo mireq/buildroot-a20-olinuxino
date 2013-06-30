@@ -17,12 +17,20 @@ define MALI400_BUILD_CMDS
 	tar -xvzf $(@D)/mali.tar.gz -C $(@D)
 	rm -rf $(@D)/lib/mali
 	mv $(@D)/linux-sunxi-sunxi-mali-proprietary-e4ced47 $(@D)/lib/mali
-	$(TARGET_MAKE_ENV) $(MAKE1) CC="$(TARGET_CC)" LD="$(TARGET_LD)" -C $(@D) config VERSION=r3p1 ABI=armhf EGL_TYPE=framebuffer
+	$(TARGET_MAKE_ENV) $(MAKE1) CC="$(TARGET_CC)" LD="$(TARGET_LD)" -C $(@D) config VERSION=r3p0 ABI=armhf EGL_TYPE=framebuffer
 	$(TARGET_MAKE_ENV) $(MAKE1) CC="$(TARGET_CC)" LD="$(TARGET_LD)" -C $(@D)
 endef
 
 define MALI400_INSTALL_STAGING_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE1) DESTDIR=$(STAGING_DIR) -C $(@D) install
+endef
+
+define MALI400_INSTALL_TARGET_CMDS
+	cp -dpf $(STAGING_DIR)/usr/lib/libEGL.so* $(TARGET_DIR)/usr/lib
+	cp -dpf $(STAGING_DIR)/usr/lib/libGLESv1_CM.so* $(TARGET_DIR)/usr/lib
+	cp -dpf $(STAGING_DIR)/usr/lib/libGLESv2.so* $(TARGET_DIR)/usr/lib
+	cp -dpf $(STAGING_DIR)/usr/lib/libMali.so $(TARGET_DIR)/usr/lib
+	cp -dpf $(STAGING_DIR)/usr/lib/libUMP.so* $(TARGET_DIR)/usr/lib
 endef
 
 $(eval $(generic-package))
