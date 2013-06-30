@@ -1,0 +1,1 @@
+setenv bootargs console=ttyS0,115200 root=/dev/mmcblk0p2 rootwait loglevel= panic=10

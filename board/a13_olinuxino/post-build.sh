@@ -5,6 +5,9 @@ BOARD_DIR="$(dirname $0)"
 BOOT=$TARGET_DIR/boot/
 
 cp -v $BOARD_DIR/script.bin $BOOT
+cp -v $BOARD_DIR/uEnv.txt $BOOT
+$TARGET_DIR/output/host/usr/bin/mkimage -C none -A arm -T script -d $BOARD_DIR/boot.cmd $BOARD_DIR/boot.scr
+cp -v $BOARD_DIR/boot.scr $BOOT
 
 if [ -e $BINARIES_DIR/u-boot.bin ];
 then
