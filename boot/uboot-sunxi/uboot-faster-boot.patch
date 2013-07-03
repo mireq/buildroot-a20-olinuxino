@@ -1,0 +1,19 @@
+--- old/include/configs/sunxi-common.h	2013-06-30 20:00:33.179906893 +0200
++++ new/include/configs/sunxi-common.h	2013-06-30 20:00:22.223299583 +0200
+@@ -181,7 +181,6 @@
+ 	"console=ttyS0,115200\0" \
+ 	"panicarg=panic=10\0" \
+ 	"extraargs=\0" \
+-	"loglevel=8\0" \
+ 	"scriptaddr=0x44000000\0" \
+ 	"device=mmc\0" \
+ 	"partition=0:1\0" \
+@@ -257,7 +256,7 @@
+ 	  "\0" \
+ 	""
+ 
+-#define CONFIG_BOOTDELAY	3
++#define CONFIG_BOOTDELAY	0
+ #define CONFIG_SYS_BOOT_GET_CMDLINE
+ #define CONFIG_AUTO_COMPLETE
+ 
