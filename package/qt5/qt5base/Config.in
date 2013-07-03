@@ -110,6 +110,9 @@ config BR2_PACKAGE_QT5BASE_WIDGETS
 config BR2_PACKAGE_QT5BASE_LINUXFB
 	bool "linuxfb support"
 
+config BR2_PACKAGE_QT5BASE_TSLIB
+	bool "tslib support"
+
 config BR2_PACKAGE_QT5BASE_DIRECTFB
 	bool "directfb support"
 	select BR2_PACKAGE_DIRECTFB

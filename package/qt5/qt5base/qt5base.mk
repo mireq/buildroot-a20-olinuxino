@@ -175,12 +175,27 @@ define QT5BASE_CONFIGURE_CMDS
 	)
 endef
 
+ifeq ($(BR2_PACKAGE_QT5BASE_TSLIB),y)
+define QT5BASE_TSLIB_BUILD_CMDS
+	cd $(@D)/src/plugins/generic/tslib; $(HOST_DIR)/usr/bin/qmake
+	$(MAKE) -C $(@D)/src/plugins/generic/tslib
+endef
+endif
+
 define QT5BASE_BUILD_CMDS
+	$(QT5BASE_TSLIB_BUILD_CMDS)
 	$(MAKE) -C $(@D)
 endef
 
+ifeq ($(BR2_PACKAGE_QT5BASE_TSLIB),y)
+define QT5BASE_TSLIB_INSTALL_STAGING_CMDS
+	$(MAKE) -C $(@D)/src/plugins/generic/tslib install
+endef
+endif
+
 define QT5BASE_INSTALL_STAGING_CMDS
 	$(MAKE) -C $(@D) install
+	$(QT5BASE_TSLIB_INSTALL_STAGING_CMDS)
 	$(QT5_LA_PRL_FILES_FIXUP)
 endef
 
