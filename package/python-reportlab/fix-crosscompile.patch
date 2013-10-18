@@ -1,0 +1,11 @@
+--- a/setup.py	2013-10-16 14:57:25.672737886 +0200
++++ b/setup.py	2013-10-16 14:57:20.702764811 +0200
+@@ -23,7 +23,7 @@
+ daily=os.environ.get('RL_EXE_DAILY','')
+ 
+ import distutils
+-from distutils.core import setup, Extension
++from setuptools import setup, Extension
+ from distutils import sysconfig
+ 
+ # from Zope - App.Common.package_home

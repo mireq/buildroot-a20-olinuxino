@@ -1,0 +1,10 @@
+config BR2_PACKAGE_PYTHON_REPORTLAB
+	bool "python-reportlab"
+	select BR2_PACKAGE_DISTRIBUTE
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_FREETYPE
+	select BR2_PACKAGE_JPEG_LIBRARY
+	help
+	  The ReportLab Toolkit. An Open Source Python library for generating PDFs and graphics.
+
+	  https://pypi.python.org/pypi/reportlab
