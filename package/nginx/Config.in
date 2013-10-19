@@ -1,0 +1,14 @@
+config BR2_PACKAGE_NGINX
+	bool "nginx"
+	help
+	  nginx [engine x] is an HTTP and reverse proxy server, as well as a mail
+	  proxy server, written by Igor Sysoev
+
+	  http://nginx.org
+
+
+if BR2_PACKAGE_NGINX
+
+
+
+endif
