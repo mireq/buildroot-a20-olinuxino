@@ -1,0 +1,14 @@
+config BR2_PACKAGE_UWSGI
+	bool "uwsgi"
+	help
+	  The uWSGI project aims at developing a full stack for building hosting
+	  services.
+
+	  http://projects.unbit.it/uwsgi/
+
+
+if BR2_PACKAGE_UWSGI
+
+
+
+endif
