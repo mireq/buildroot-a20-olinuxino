@@ -168,7 +168,7 @@ define QT5BASE_CONFIGURE_CMDS
 		-sysroot $(STAGING_DIR) \
 		-plugindir /usr/lib/qt/plugins \
 		-no-rpath \
-		-nomake examples -nomake demos -nomake tests \
+		-nomake examples -nomake tests \
 		-device buildroot \
 		-no-c++11 \
 		$(QT5BASE_CONFIGURE_OPTS) \
