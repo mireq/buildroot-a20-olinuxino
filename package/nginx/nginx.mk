@@ -30,8 +30,8 @@ NGINX_CONF_OPTS = --with-cc=$(TARGET_CC) \
 	--with-time-t=${PTRSIZE} \
 	--with-sys-nerr=132 \
 	--conf-path=/etc/nginx/nginx.conf \
-	--http-log-path=/var/log/nginx/access.log \
-	--error-log-path=/var/log/nginx/error.log \
+	--http-log-path=/var/log/nginx_access.log \
+	--error-log-path=/var/log/nginx_error.log \
 	--pid-path=/var/run/nginx/nginx.pid \
 	--crossbuild=$(GNU_TARGET_NAME)
 
