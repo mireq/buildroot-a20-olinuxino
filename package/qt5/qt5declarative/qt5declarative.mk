@@ -44,7 +44,6 @@ endef
 endif
 
 define QT5DECLARATIVE_INSTALL_TARGET_CMDS
-	cp -dpf $(STAGING_DIR)/usr/bin/qml* $(TARGET_DIR)/usr/bin
 	cp -dpfr $(STAGING_DIR)/usr/qml $(TARGET_DIR)/usr
 	$(QT5DECLARATIVE_INSTALL_TARGET_LIBS)
 endef
