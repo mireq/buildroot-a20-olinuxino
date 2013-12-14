@@ -25,7 +25,6 @@ QT5BASE_CONFIGURE_OPTS += \
 	-no-nis \
 	-no-libudev \
 	-no-iconv \
-	-no-gstreamer \
 	-no-gtkstyle \
 	-system-zlib \
 	-system-pcre \
