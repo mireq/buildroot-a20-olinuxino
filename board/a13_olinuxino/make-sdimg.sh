@@ -10,7 +10,7 @@ if [ ! -f "$ARG_ROOTFS_TAR" -a ! -d "$ARG_ROOTFS_TAR" ]; then
     exit 1
 fi
 
-[ -n "$ARG_SDIMG_MB" ] && ARG_SDIMG_MB=100
+[ -n "$ARG_SDIMG_MB" ] && ARG_SDIMG_MB=200
 [ ! -d "$ARG_OUTPUT_DIR" ] && ARG_OUTPUT_DIR=.
 
 ROOTFS_TAR="$ARG_ROOTFS_TAR"
