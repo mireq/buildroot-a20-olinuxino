@@ -177,14 +177,14 @@ endef
 
 ifeq ($(BR2_PACKAGE_QT5BASE_TSLIB),y)
 define QT5BASE_TSLIB_BUILD_CMDS
-	cd $(@D)/src/plugins/generic/tslib; $(HOST_DIR)/usr/bin/qmake
+	cd $(@D)/src/plugins/generic/tslib; $(@D)/bin/qmake
 	$(MAKE) -C $(@D)/src/plugins/generic/tslib
 endef
 endif
 
 define QT5BASE_BUILD_CMDS
-	$(QT5BASE_TSLIB_BUILD_CMDS)
 	$(MAKE) -C $(@D)
+	$(QT5BASE_TSLIB_BUILD_CMDS)
 endef
 
 ifeq ($(BR2_PACKAGE_QT5BASE_TSLIB),y)
