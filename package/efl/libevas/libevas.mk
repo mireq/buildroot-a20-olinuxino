@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBEVAS_VERSION = 1.7.4
+LIBEVAS_VERSION = $(EFL_VERSION)
 LIBEVAS_SOURCE = evas-$(LIBEVAS_VERSION).tar.bz2
 LIBEVAS_SITE = http://download.enlightenment.org/releases/
 LIBEVAS_LICENSE = BSD-2c
@@ -201,6 +201,11 @@ LIBEVAS_CONF_OPT += --enable-font-loader-eet
 LIBEVAS_DEPENDENCIES += libeet
 else
 LIBEVAS_CONF_OPT += --disable-font-loader-eet
+endif
+
+# async image preload support needs threads support in toolchain
+ifneq ($(BR2_TOOLCHAIN_HAS_THREADS),y)
+LIBEVAS_CONF_OPT += --disable-async-preload
 endif
 
 # libevas installs the source code of examples on the target, which

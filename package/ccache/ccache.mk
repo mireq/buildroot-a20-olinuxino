@@ -6,15 +6,9 @@
 
 CCACHE_VERSION = 3.1.8
 CCACHE_SITE    = http://samba.org/ftp/ccache
-CCACHE_SOURCE  = ccache-$(CCACHE_VERSION).tar.bz2
+CCACHE_SOURCE  = ccache-$(CCACHE_VERSION).tar.xz
 CCACHE_LICENSE = GPLv3+, others
 CCACHE_LICENSE_FILES = LICENSE.txt GPL-3.0.txt
-
-# When ccache is being built for the host, ccache is not yet
-# available, so we have to use the special C compiler without the
-# cache.
-HOST_CCACHE_CONF_ENV = \
-	CC="$(HOSTCC_NOCCACHE)"
 
 # Force ccache to use its internal zlib. The problem is that without
 # this, ccache would link against the zlib of the build system, but we
@@ -50,5 +44,13 @@ $(eval $(host-autotools-package))
 ifeq ($(BR2_CCACHE),y)
 ccache-stats: host-ccache
 	$(Q)$(CCACHE) -s
-endif
 
+ccache-options: host-ccache
+ifeq ($(CCACHE_OPTIONS),)
+	$(Q)echo "Usage: make ccache-options CCACHE_OPTIONS=\"opts\""
+	$(Q)echo "where 'opts' corresponds to one or more valid ccache options" \
+	"(see ccache help text below)"
+	$(Q)echo
+endif
+	$(Q)$(CCACHE) $(CCACHE_OPTIONS)
+endif

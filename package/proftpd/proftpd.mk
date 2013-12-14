@@ -7,6 +7,8 @@
 PROFTPD_VERSION = 1.3.3g
 PROFTPD_SOURCE = proftpd-$(PROFTPD_VERSION).tar.bz2
 PROFTPD_SITE = ftp://ftp.proftpd.org/distrib/source/
+PROFTPD_LICENSE = GPLv2+
+PROFTPD_LICENSE_FILES = COPYING
 
 PROFTPD_CONF_ENV = ac_cv_func_setpgrp_void=yes \
 		ac_cv_func_setgrent_void=yes
@@ -39,12 +41,6 @@ define PROFTPD_INSTALL_TARGET_CMDS
 		$(if $(BR2_INET_IPV6),,$(SED) 's/^UseIPv6/# UseIPv6/' $(TARGET_DIR)/etc/proftpd.conf;) \
 	fi
 	$(INSTALL) -m 0755 package/proftpd/S50proftpd $(TARGET_DIR)/etc/init.d
-endef
-
-define PROFTPD_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/$(PROFTPD_TARGET_BINARY)
-	rm -f $(TARGET_DIR)/etc/init.d/S50proftpd
-	rm -f $(TARGET_DIR)/etc/proftpd.conf
 endef
 
 $(eval $(autotools-package))

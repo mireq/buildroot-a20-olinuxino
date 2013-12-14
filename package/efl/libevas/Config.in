@@ -1,5 +1,6 @@
 config BR2_PACKAGE_LIBEVAS
 	bool "libevas"
+	depends on !BR2_avr32 # no epoll_create1 or inotify_init1
 	select BR2_PACKAGE_FREETYPE
 	select BR2_PACKAGE_LIBEINA
 	# required to build so far
@@ -141,10 +142,10 @@ config BR2_PACKAGE_LIBEVAS_GL
 	select BR2_PACKAGE_LIBEET
 
 config BR2_PACKAGE_LIBEVAS_GLES_SGX
-       bool "OpenGL-ES SGX"
+	bool "OpenGL-ES SGX"
 
 config BR2_PACKAGE_LIBEVAS_GLES_S3C6410
-       bool "OpenGL-ES S3C6410"
+	bool "OpenGL-ES S3C6410"
 endchoice
 
 

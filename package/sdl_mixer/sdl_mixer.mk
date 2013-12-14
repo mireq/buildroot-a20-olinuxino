@@ -1,6 +1,6 @@
 ################################################################################
 #
-# SDL_mixer
+# sdl_mixer
 #
 ################################################################################
 
@@ -36,12 +36,6 @@ endif
 
 define SDL_MIXER_INSTALL_TARGET_CMDS
 	cp -dpf $(STAGING_DIR)/usr/lib/libSDL_mixer*.so* $(TARGET_DIR)/usr/lib/
-endef
-
-define SDL_MIXER_CLEAN_CMDS
-	rm -f $(TARGET_DIR)/usr/lib/libSDL_mixer*.so*
-	-$(MAKE) DESTDIR=$(STAGING_DIR) -C $(@D) uninstall
-	-$(MAKE) -C $(@D) clean
 endef
 
 $(eval $(autotools-package))

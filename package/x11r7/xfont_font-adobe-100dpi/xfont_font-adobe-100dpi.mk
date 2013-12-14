@@ -1,6 +1,6 @@
 ################################################################################
 #
-# font-adobe-100dpi
+# xfont_font-adobe-100dpi
 #
 ################################################################################
 
@@ -15,4 +15,3 @@ XFONT_FONT_ADOBE_100DPI_INSTALL_TARGET_OPT = DESTDIR=$(TARGET_DIR) MKFONTSCALE=$
 XFONT_FONT_ADOBE_100DPI_DEPENDENCIES = xfont_font-util host-xfont_font-util host-xapp_mkfontscale host-xapp_mkfontdir host-xapp_bdftopcf
 
 $(eval $(autotools-package))
-

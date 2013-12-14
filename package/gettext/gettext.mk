@@ -4,13 +4,12 @@
 #
 ################################################################################
 
-GETTEXT_VERSION = 0.18.2.1
+GETTEXT_VERSION = 0.18.3.1
 GETTEXT_SITE = $(BR2_GNU_MIRROR)/gettext
 GETTEXT_INSTALL_STAGING = YES
 GETTEXT_LICENSE = GPLv2+
 GETTEXT_LICENSE_FILES = COPYING
 GETTEXT_AUTORECONF = YES
-HOST_GETTEXT_AUTORECONF = YES
 
 GETTEXT_DEPENDENCIES = $(if $(BR2_PACKAGE_LIBICONV),libiconv)
 HOST_GETTEXT_DEPENDENCIES = # we don't want the libiconv dependency
@@ -57,6 +56,13 @@ define GETTEXT_INSTALL_TARGET_CMDS
 endef
 endif
 endif # GETTEXT_TOOLS = n
+
+# Library lacks +x so strip skips it
+define GETTEXT_FIX_LIBRARY_MODE
+	-chmod +x $(TARGET_DIR)/usr/lib/libintl.so*
+endef
+
+GETTEXT_POST_INSTALL_TARGET_HOOKS += GETTEXT_FIX_LIBRARY_MODE
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

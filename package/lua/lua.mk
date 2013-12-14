@@ -64,18 +64,6 @@ define LUA_INSTALL_STAGING_CMDS
 	$(INSTALL) -m 0644 -D $(@D)/src/lauxlib.h $(STAGING_DIR)/usr/include/lauxlib.h
 endef
 
-ifeq ($(BR2_HAVE_DEVFILES),y)
-define LUA_INSTALL_DEVFILES
-	$(INSTALL) -m 0644 -D $(@D)/etc/lua.pc \
-		$(TARGET_DIR)/usr/lib/pkgconfig/lua.pc
-	$(INSTALL) -m 0644 -D $(@D)/src/lua.h $(TARGET_DIR)/usr/include/lua.h
-	$(INSTALL) -m 0644 -D $(@D)/src/luaconf.h $(TARGET_DIR)/usr/include/luaconf.h
-	$(INSTALL) -m 0644 -D $(@D)/src/lualib.h $(TARGET_DIR)/usr/include/lualib.h
-	$(INSTALL) -m 0644 -D $(@D)/src/lauxlib.h $(TARGET_DIR)/usr/include/lauxlib.h
-endef
-endif
-
-
 define LUA_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(@D)/src/lua $(TARGET_DIR)/usr/bin/lua
 	$(INSTALL) -m 0755 -D $(@D)/src/luac $(TARGET_DIR)/usr/bin/luac
@@ -83,7 +71,6 @@ define LUA_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/lib/liblua.so.$(LUA_VERSION)
 	ln -sf liblua.so.$(LUA_VERSION) $(TARGET_DIR)/usr/lib/liblua.so
 	$(INSTALL) -m 0644 -D $(@D)/src/liblua.a $(TARGET_DIR)/usr/lib/liblua.a
-	$(LUA_INSTALL_DEVFILES)
 endef
 
 define HOST_LUA_INSTALL_CMDS
@@ -111,32 +98,6 @@ LUA_INSTALLED_FILES = \
 	/usr/bin/luac \
 	/usr/lib/liblua.a \
 	/usr/lib/liblua.so*
-
-define LUA_UNINSTALL_STAGING_CMDS
-	for i in $(LUA_INSTALLED_FILES); do \
-		rm -f $(STAGING_DIR)$$i; \
-	done
-endef
-
-define LUA_UNINSTALL_TARGET_CMDS
-	for i in $(LUA_INSTALLED_FILES); do \
-		rm -f $(TARGET_DIR)$$i; \
-	done
-endef
-
-define HOST_LUA_UNINSTALL_TARGET_CMDS
-	for i in $(LUA_INSTALLED_FILES); do \
-		rm -f $(HOST_DIR)$$i; \
-	done
-endef
-
-define LUA_CLEAN_CMDS
-	-$(MAKE) -C $(@D) clean
-endef
-
-define HOST_LUA_CLEAN_CMDS
-	-$(MAKE) -C $(@D) clean
-endef
 
 $(eval $(generic-package))
 $(eval $(host-generic-package))

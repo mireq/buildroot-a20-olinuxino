@@ -4,7 +4,12 @@
 #
 ################################################################################
 
-BERKELEYDB_VERSION = 5.3.21
+# Since BerkeleyDB version 6 and above are licensed under the Affero
+# GPL (AGPL), we want to keep this 'bdb' package at version 5.x to
+# avoid licensing issues.
+# BerkeleyDB version 6 or above should be provided by a dedicated
+# package instead.
+BERKELEYDB_VERSION = 5.3.28
 BERKELEYDB_SITE = http://download.oracle.com/berkeley-db
 BERKELEYDB_SOURCE = db-$(BERKELEYDB_VERSION).NC.tar.gz
 BERKELEYDB_SUBDIR = build_unix
@@ -31,7 +36,7 @@ define BERKELEYDB_CONFIGURE_CMDS
 		$(if $(BR2_INSTALL_LIBSTDCPP),--enable-cxx,--disable-cxx) \
 		--disable-java \
 		--disable-tcl \
-		--disable-compat185 \
+		$(if $(BR2_PACKAGE_BERKELEYDB_COMPAT185),--enable-compat185,--disable-compat185) \
 		$(SHARED_STATIC_LIBS_OPTS) \
 		--with-pic \
 		--enable-o_direct \

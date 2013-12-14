@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Virtual package for libEGL
+# libegl
 #
 ################################################################################
 
@@ -12,6 +12,18 @@ endif
 
 ifeq ($(BR2_PACKAGE_MALI400),y)
 LIBEGL_DEPENDENCIES += mali400
+endif
+
+ifeq ($(BR2_PACKAGE_TI_GFX),y)
+LIBEGL_DEPENDENCIES += ti-gfx
+endif
+
+ifeq ($(BR2_PACKAGE_SUNXI_MALI),y)
+LIBEGL_DEPENDENCIES += sunxi-mali
+endif
+
+ifeq ($(BR2_PACKAGE_GPU_VIV_BIN_MX6Q),y)
+LIBEGL_DEPENDENCIES += gpu-viv-bin-mx6q
 endif
 
 ifeq ($(LIBEGL_DEPENDENCIES),)

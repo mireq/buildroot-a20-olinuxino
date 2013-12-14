@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-POLARSSL_SITE = https://polarssl.org/download
-POLARSSL_VERSION = 1.2.7
+POLARSSL_SITE = https://polarssl.org/code/releases
+POLARSSL_VERSION = 1.2.10
 POLARSSL_SOURCE = polarssl-$(POLARSSL_VERSION)-gpl.tgz
 POLARSSL_CONF_OPT = \
 	-DUSE_SHARED_POLARSSL_LIBRARY=ON \
@@ -18,4 +18,3 @@ POLARSSL_LICENSE = GPLv2
 POLARSSL_LICENSE_FILES = LICENSE
 
 $(eval $(cmake-package))
-

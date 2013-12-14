@@ -5,7 +5,7 @@
 ################################################################################
 
 XFSPROGS_VERSION = 3.1.11
-XFSPROGS_SITE=ftp://oss.sgi.com/projects/xfs/cmd_tars
+XFSPROGS_SITE = ftp://oss.sgi.com/projects/xfs/cmd_tars
 
 XFSPROGS_DEPENDENCIES = util-linux
 
@@ -17,6 +17,5 @@ XFSPROGS_CONF_OPT = \
 	INSTALL_GROUP=root
 
 XFSPROGS_INSTALL_TARGET_OPT = DIST_ROOT=$(TARGET_DIR) install
-XFSPROGS_UNINSTALL_TARGET_OPT = DIST_ROOT=$(TARGET_DIR) uninstall
 
 $(eval $(autotools-package))

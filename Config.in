@@ -14,10 +14,20 @@ config BR2_HOSTARCH
 	string
 	option env="HOSTARCH"
 
+config BR2_EXTERNAL
+	string
+	option env="BR2_EXTERNAL"
+
 # Hidden boolean selected by pre-built packages for x86, when they
 # need to run on x86-64 machines (example: pre-built external
 # toolchains, binary tools like SAM-BA, etc.).
 config BR2_HOSTARCH_NEEDS_IA32_LIBS
+	bool
+
+# Hidden boolean selected by packages that need to build 32 bits
+# binaries with the host compiler, even on 64 bits build machines (e.g
+# bootloaders).
+config BR2_HOSTARCH_NEEDS_IA32_COMPILER
 	bool
 
 source "arch/Config.in"
@@ -41,6 +51,10 @@ config BR2_BZR
 config BR2_GIT
 	string "Git command"
 	default "git"
+
+config BR2_CVS
+	string "CVS command"
+	default "cvs"
 
 config BR2_LOCALFILES
 	string "Local files retrieval command"
@@ -286,7 +300,7 @@ choice
 
 config BR2_STRIP_strip
 	bool "strip"
-	depends on !BR2_ELF2FLT
+	depends on !BR2_PACKAGE_HOST_ELF2FLT
 	help
 	  Binaries and libraries in the target filesystem will be
 	  stripped using the normal 'strip' command. This allows to
@@ -297,7 +311,7 @@ config BR2_STRIP_strip
 config BR2_STRIP_sstrip
 	bool "sstrip"
 	select BR2_PACKAGE_SSTRIP_HOST
-	depends on !BR2_ELF2FLT
+	depends on !BR2_PACKAGE_HOST_ELF2FLT
 	help
 	  Binaries and libraries in the target filesystem will be
 	  stripped using the 'sstrip' command, which strips a little
@@ -398,6 +412,23 @@ config BR2_OPTIMIZE_S
 
 endchoice
 
+config BR2_ENABLE_SSP
+	bool "build code with Stack Smashing Protection"
+	depends on BR2_TOOLCHAIN_HAS_SSP
+	help
+	  Enable stack smashing protection support using GCCs
+	  -fstack-protector-all option.
+
+	  See http://www.linuxfromscratch.org/hints/downloads/files/ssp.txt
+	  for details.
+
+	  Note that this requires the toolchain to have SSP
+	  support. This is always the case for glibc and eglibc
+	  toolchain, but is optional in uClibc toolchains.
+
+comment "enabling Stack Smashing Protection requires support in the toolchain"
+	depends on !BR2_TOOLCHAIN_HAS_SSP
+
 config BR2_PREFER_STATIC_LIB
 	bool "prefer static libraries"
 	help
@@ -418,14 +449,6 @@ config BR2_HAVE_DOCUMENTATION
 	  pages, on the target.
 	  If you say n here, your target will not contain any
 	  documentation.
-
-config BR2_HAVE_DEVFILES
-	bool "development files in target filesystem"
-	# We no longer want to support a toolchain on the target
-	depends on BR2_DEPRECATED
-	help
-	  Install headers and static libraries in the
-	  target filesystem
 
 config BR2_PACKAGE_OVERRIDE_FILE
 	string "location of a package override file"
@@ -458,14 +481,21 @@ source "toolchain/Config.in"
 
 source "system/Config.in"
 
-source "package/Config.in"
+source "linux/Config.in"
 
-source "package/Config.in.host"
+source "package/Config.in"
 
 source "fs/Config.in"
 
 source "boot/Config.in"
 
-source "linux/Config.in"
+source "package/Config.in.host"
 
 source "Config.in.legacy"
+
+menu "User-provided options"
+	depends on BR2_EXTERNAL != "support/dummy-external"
+
+source "$BR2_EXTERNAL/Config.in"
+
+endmenu

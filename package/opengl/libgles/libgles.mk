@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Virtual package for libGLES
+# libgles
 #
 ################################################################################
 
@@ -12,6 +12,18 @@ endif
 
 ifeq ($(BR2_PACKAGE_MALI400),y)
 LIBGLES_DEPENDENCIES += mali400
+endif
+
+ifeq ($(BR2_PACKAGE_TI_GFX),y)
+LIBGLES_DEPENDENCIES += ti-gfx
+endif
+
+ifeq ($(BR2_PACKAGE_SUNXI_MALI),y)
+LIBGLES_DEPENDENCIES += sunxi-mali
+endif
+
+ifeq ($(BR2_PACKAGE_GPU_VIV_BIN_MX6Q),y)
+LIBGLES_DEPENDENCIES += gpu-viv-bin-mx6q
 endif
 
 ifeq ($(LIBGLES_DEPENDENCIES),)

@@ -132,7 +132,7 @@ fi;
 
 # Check that a few mandatory programs are installed
 missing_progs="no"
-for prog in patch perl tar wget cpio python unzip rsync ${DL_TOOLS} ; do
+for prog in patch perl tar wget cpio python unzip rsync bc ${DL_TOOLS} ; do
     if ! which $prog > /dev/null ; then
 	/bin/echo -e "You must install '$prog' on your build machine";
 	missing_progs="yes"
@@ -173,22 +173,24 @@ if grep -q ^BR2_PACKAGE_CLASSPATH=y $BUILDROOT_CONFIG ; then
     done
 fi
 
-if grep -E '^BR2_TARGET_GENERIC_ROOT_PASSWD=".+"$' $BUILDROOT_CONFIG > /dev/null 2>&1; then
-    if ! which mkpasswd > /dev/null 2>&1; then
-        /bin/echo -e "\nYou need the 'mkpasswd' utility to set the root password\n"
-        /bin/echo -e "(in Debian/ubuntu, 'mkpasswd' provided by the whois package)\n"
-        exit 1
-    fi
-fi
-
 if grep -q ^BR2_HOSTARCH_NEEDS_IA32_LIBS=y $BUILDROOT_CONFIG ; then
     if test ! -f /lib/ld-linux.so.2 ; then
 	/bin/echo -e "\nYour Buildroot configuration uses pre-built tools for the x86 architecture,"
 	/bin/echo -e "but your build machine uses the x86-64 architecture without the 32 bits compatibility"
 	/bin/echo -e "library."
-	/bin/echo -e "If you're running a Debian/Ubuntu distribution, install the libc:i386 package."
+	/bin/echo -e "If you're running a Debian/Ubuntu distribution, install the libc6:i386,"
+	/bin/echo -e "libstdc++6:i386, and zlib1g:i386 packages."
 	/bin/echo -e "For other distributions, refer to the documentation on how to install the 32 bits"
 	/bin/echo -e "compatibility libraries."
+	exit 1
+    fi
+fi
+
+if grep -q ^BR2_HOSTARCH_NEEDS_IA32_COMPILER=y $BUILDROOT_CONFIG ; then
+    if ! echo "int main(void) {}" | gcc -m32 -x c - ; then
+	/bin/echo -e "\nYour Buildroot configuration needs a compiler capable of building 32 bits binaries."
+	/bin/echo -e "If you're running a Debian/Ubuntu distribution, install the gcc-multilib package."
+	/bin/echo -e "For other distributions, refer to their documentation."
 	exit 1
     fi
 fi

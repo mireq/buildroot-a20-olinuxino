@@ -14,16 +14,11 @@ DIALOG_LICENSE = LGPLv2.1
 DIALOG_LICENSE_FILES = COPYING
 
 ifneq ($(BR2_ENABLE_LOCALE),y)
-DIALOG_DEPENDENCIES+=libiconv
+DIALOG_DEPENDENCIES += libiconv
 endif
 
 define DIALOG_INSTALL_TARGET_CMDS
 	install -c $(@D)/dialog $(TARGET_DIR)/usr/bin/dialog
-endef
-
-define DIALOG_POST_CLEAN
-	-$(MAKE) -C $(@D) clean
-	rm -f $(TARGET_DIR)/usr/bin/dialog
 endef
 
 $(eval $(autotools-package))

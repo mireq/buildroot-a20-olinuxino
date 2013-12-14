@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-ZLIB_VERSION = 1.2.7
-ZLIB_SOURCE =zlib-$(ZLIB_VERSION).tar.bz2
+ZLIB_VERSION = 1.2.8
+ZLIB_SOURCE = zlib-$(ZLIB_VERSION).tar.xz
 ZLIB_SITE = http://downloads.sourceforge.net/project/libpng/zlib/$(ZLIB_VERSION)
 ZLIB_LICENSE = zlib license
 ZLIB_LICENSE_FILES = README
@@ -58,22 +58,6 @@ endef
 
 define HOST_ZLIB_INSTALL_CMDS
 	$(MAKE1) -C $(@D) LDCONFIG=true install
-endef
-
-define ZLIB_CLEAN_CMDS
-	-$(MAKE1) -C $(@D) clean
-endef
-
-define ZLIB_UNINSTALL_STAGING_CMDS
-	$(MAKE1) -C $(@D) DESTDIR=$(STAGING_DIR) uninstall
-endef
-
-define ZLIB_UNINSTALL_TARGET_CMDS
-	$(MAKE1) -C $(@D) DESTDIR=$(TARGET_DIR) uninstall
-endef
-
-define HOST_ZLIB_UNINSTALL_TARGET_CMDS
-	$(MAKE1) -C $(@D) uninstall
 endef
 
 $(eval $(generic-package))

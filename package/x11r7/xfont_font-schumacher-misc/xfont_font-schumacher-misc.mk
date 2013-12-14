@@ -1,6 +1,6 @@
 ################################################################################
 #
-# font-schumacher-misc
+# xfont_font-schumacher-misc
 #
 ################################################################################
 
@@ -15,4 +15,3 @@ XFONT_FONT_SCHUMACHER_MISC_INSTALL_TARGET_OPT = DESTDIR=$(TARGET_DIR) MKFONTSCAL
 XFONT_FONT_SCHUMACHER_MISC_DEPENDENCIES = xfont_font-util host-xfont_font-util host-xapp_mkfontscale host-xapp_mkfontdir host-xapp_bdftopcf
 
 $(eval $(autotools-package))
-

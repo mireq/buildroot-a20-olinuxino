@@ -5,11 +5,11 @@
 ################################################################################
 
 GAMIN_VERSION = 0.1.10
-GAMIN_SOURCE = gamin-$(GAMIN_VERSION).tar.gz
 GAMIN_SITE = http://www.gnome.org/~veillard/gamin/sources
 GAMIN_AUTORECONF = YES
 GAMIN_INSTALL_STAGING = YES
-
+GAMIN_LICENSE = LGPLv2+
+GAMIN_LICENSE_FILES = COPYING
 GAMIN_CONF_OPT = --disable-debug
 
 # python support broken
@@ -24,4 +24,3 @@ endif
 GAMIN_DEPENDENCIES = libglib2
 
 $(eval $(autotools-package))
-

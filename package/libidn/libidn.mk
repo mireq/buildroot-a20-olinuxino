@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBIDN_VERSION = 1.27
+LIBIDN_VERSION = 1.28
 LIBIDN_SITE = $(BR2_GNU_MIRROR)/libidn
 LIBIDN_INSTALL_STAGING = YES
 LIBIDN_CONF_ENV = EMACS="no"
@@ -26,10 +26,5 @@ define LIBIDN_REMOVE_EMACS_STUFF
 endef
 
 LIBIDN_POST_INSTALL_TARGET_HOOKS += LIBIDN_REMOVE_EMACS_STUFF
-
-define LIBIDN_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/usr/lib/libidn*
-	rm -f $(TARGET_DIR)/usr/bin/idn
-endef
 
 $(eval $(autotools-package))

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SAMBA_VERSION = 3.6.15
+SAMBA_VERSION = 3.6.22
 SAMBA_SITE = http://ftp.samba.org/pub/samba/stable
 SAMBA_SUBDIR = source3
 SAMBA_INSTALL_STAGING = YES
@@ -64,11 +64,6 @@ SAMBA_INSTALL_TARGET_OPT = \
 	DESTDIR=$(TARGET_DIR) -C $(SAMBA_DIR)/$(SAMBA_SUBDIR) \
 	installlibs installservers installbin installscripts \
 	$(if $(BR2_PACKAGE_SAMBA_SWAT),installswat)
-
-SAMBA_UNINSTALL_TARGET_OPT = \
-	DESTDIR=$(TARGET_DIR) -C $(SAMBA_DIR)/$(SAMBA_SUBDIR) \
-	uninstalllibs uninstallservers uninstallbin uninstallscripts \
-	$(if $(BR2_PACKAGE_SAMBA_SWAT),uninstallswat)
 
 # binaries to keep
 SAMBA_BINTARGETS_y = \

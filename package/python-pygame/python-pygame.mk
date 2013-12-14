@@ -1,6 +1,6 @@
 ################################################################################
 #
-# pygame
+# python-pygame
 #
 ################################################################################
 
@@ -103,10 +103,6 @@ define PYTHON_PYGAME_INSTALL_TARGET_CMDS
 		--prefix=$(TARGET_DIR)/usr)
 	rm -rf $(TARGET_DIR)/usr/lib/python*/site-packages/pygame/tests
 	$(PYTHON_PYGAME_REMOVE_DOC)
-endef
-
-define PYTHON_PYGAME_UNINSTALL_TARGET_CMDS
-	rm -rf $(TARGET_DIR)/usr/lib/python*/site-packages/pygame*
 endef
 
 $(eval $(generic-package))

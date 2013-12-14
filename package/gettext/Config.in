@@ -24,5 +24,6 @@ config BR2_PACKAGE_GETTEXT_TOOLS
 	  the target filesystem. This is typically not useful for
 	  correct operation of programs.
 
-comment "gettext requires a toolchain with WCHAR support"
-	depends on BR2_NEEDS_GETTEXT && !BR2_USE_WCHAR
+comment "gettext needs a toolchain w/ wchar"
+	depends on BR2_NEEDS_GETTEXT
+	depends on !BR2_USE_WCHAR

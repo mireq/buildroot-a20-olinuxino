@@ -20,6 +20,11 @@ config BR2_PACKAGE_LINUX_FIRMWARE_ATHEROS_9271
 	help
 	  Firmware files for the Atheros 9271 module
 
+config BR2_PACKAGE_LINUX_FIRMWARE_BRCM_BCM43XX
+	bool "Broadcom BRCM bcm43xx"
+	help
+	  Firmware files for the Broadcom BRCM bcm43xx
+
 config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_5000
 	bool "Intel iwlwifi 5000"
 	help
@@ -27,19 +32,19 @@ config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_5000
 	  the iwlwifi kernel driver.
 
 config BR2_PACKAGE_LINUX_FIRMWARE_LIBERTAS_SD8686_V8
-       bool "Libertas SD 8686 v8"
-       help
-         Firmware files (version 8) for the Marvell SD8686 module
+	bool "Libertas SD 8686 v8"
+	help
+	  Firmware files (version 8) for the Marvell SD8686 module
 
 config BR2_PACKAGE_LINUX_FIRMWARE_LIBERTAS_SD8686_V9
-       bool "Libertas SD 8686 v9"
-       help
-         Firmware files (version 9) for the Marvell SD8686 module
+	bool "Libertas SD 8686 v9"
+	help
+	  Firmware files (version 9) for the Marvell SD8686 module
 
 config BR2_PACKAGE_LINUX_FIRMWARE_LIBERTAS_SD8688
-       bool "Libertas SD 8688"
-       help
-         Firmware files for the Marvell SD8688 module
+	bool "Libertas SD 8688"
+	help
+	  Firmware files for the Marvell SD8688 module
 
 config BR2_PACKAGE_LINUX_FIRMWARE_MWIFIEX_SD8787
 	bool "Marvell Wifi-Ex SD 8787"
