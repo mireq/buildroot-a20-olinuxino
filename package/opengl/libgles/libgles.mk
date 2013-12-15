@@ -10,10 +10,6 @@ ifeq ($(BR2_PACKAGE_RPI_USERLAND),y)
 LIBGLES_DEPENDENCIES += rpi-userland
 endif
 
-ifeq ($(BR2_PACKAGE_MALI400),y)
-LIBGLES_DEPENDENCIES += mali400
-endif
-
 ifeq ($(BR2_PACKAGE_TI_GFX),y)
 LIBGLES_DEPENDENCIES += ti-gfx
 endif
