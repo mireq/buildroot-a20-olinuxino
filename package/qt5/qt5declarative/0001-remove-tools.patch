@@ -1,49 +1,32 @@
---- old/src/src.pro	2013-12-14 22:07:36.778029521 +0100
-+++ new/src/src.pro	2013-12-14 22:20:27.120522880 +0100
-@@ -12,7 +12,6 @@
- 
- SUBDIRS += \
-     plugins \
--    imports \
--    qmldevtools
-+    imports
- 
- qmldevtools.CONFIG = host_build
---- old/tools/tools.pro	2013-12-14 22:20:47.513745738 +0100
-+++ new/tools/tools.pro	2013-12-14 22:21:26.036870375 +0100
-@@ -1,34 +1,2 @@
+diff -urN qtdeclarative-opensource-src-5.2.1.old/src/qmldevtools/qmldevtools.pro qtdeclarative-opensource-src-5.2.1/src/qmldevtools/qmldevtools.pro
+--- qtdeclarative-opensource-src-5.2.1.old/src/qmldevtools/qmldevtools.pro	2014-02-01 21:38:02.000000000 +0100
++++ qtdeclarative-opensource-src-5.2.1/src/qmldevtools/qmldevtools.pro	2014-02-08 16:27:35.530461798 +0100
+@@ -1,4 +1,3 @@
+-option(host_build)
+ TARGET     = QtQmlDevTools
+ QT         = core
+ CONFIG += static no_module_headers internal_module
+diff -urN qtdeclarative-opensource-src-5.2.1.old/tools/tools.pro qtdeclarative-opensource-src-5.2.1/tools/tools.pro
+--- qtdeclarative-opensource-src-5.2.1.old/tools/tools.pro	2014-02-01 21:38:02.000000000 +0100
++++ qtdeclarative-opensource-src-5.2.1/tools/tools.pro	2014-02-08 16:15:13.200420412 +0100
+@@ -1,19 +1,11 @@
  TEMPLATE = subdirs
 -SUBDIRS += \
 -    qmlmin \
 -    qmlimportscanner
--
--qmlmin.CONFIG = host_build
--qmlimportscanner.CONFIG = host_build
--
--!android|android_app {
+ 
+ qmlmin.CONFIG = host_build
+ qmlimportscanner.CONFIG = host_build
+ 
+ !android|android_app {
 -    SUBDIRS += \
 -        qml \
 -        qmlprofiler \
 -        qmlbundle
--    qtHaveModule(quick) {
+     qtHaveModule(quick) {
 -        SUBDIRS += qmlscene qmlplugindump
 -        qtHaveModule(widgets): SUBDIRS += qmleasing
--    }
--    qtHaveModule(qmltest): SUBDIRS += qmltestrunner
--    contains(QT_CONFIG, private_tests): SUBDIRS += qmljs
--}
--
--qml.depends = qmlimportscanner
--qmleasing.depends = qmlimportscanner
--
--# qmlmin, qmlimportscanner & qmlbundle are build tools.
--# qmlscene is needed by the autotests.
--# qmltestrunner may be useful for manual testing.
--# qmlplugindump cannot be a build tool, because it loads target plugins.
--# The other apps are mostly "desktop" tools and are thus excluded.
--qtNomakeTools( \
--    qmlprofiler \
--    qmlplugindump \
--    qmleasing \
--)
-+SUBDIRS =
++        SUBDIRS += qmlscene
+     }
+     qtHaveModule(qmltest): SUBDIRS += qmltestrunner
+     contains(QT_CONFIG, private_tests): SUBDIRS += qmljs
