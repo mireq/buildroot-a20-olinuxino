@@ -21,4 +21,11 @@ config BR2_PACKAGE_OPKG_GPG_SIGN
 	  Enable opkg package signature checking support using
 	  gnupg/libgpgme.
 
+config BR2_PACKAGE_OPKG_CURL
+	bool "curl support"
+	select BR2_PACKAGE_CURL
+	select BR2_PACKAGE_LIBCURL
+	help
+	  Enable curl support.
+
 endif
