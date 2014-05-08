@@ -3,28 +3,62 @@ Python: add am_cv_python_includes to override runtime python-config check
  configure |    7 +++++++
  1 file changed, 7 insertions(+)
 
-Index: dbus-python-0.83.0/configure
+Index: dbus-python-0.84.0/configure
 ===================================================================
---- dbus-python-0.83.0.orig/configure
-+++ dbus-python-0.83.0/configure
-@@ -10176,6 +10176,12 @@
+--- dbus-python-0.84.0.orig/configure
++++ dbus-python-0.84.0/configure
+@@ -11586,30 +11586,32 @@
  
- { echo "$as_me:$LINENO: checking for Python headers using $PYTHON-config --includes" >&5
- echo $ECHO_N "checking for Python headers using $PYTHON-config --includes... $ECHO_C" >&6; }
+ 
+ 
+-if test "${PYTHON_INCLUDES+set}" = set; then
+-  { $as_echo "$as_me:${as_lineno-$LINENO}: PYTHON_INCLUDES overridden to: $PYTHON_INCLUDES" >&5
+-$as_echo "$as_me: PYTHON_INCLUDES overridden to: $PYTHON_INCLUDES" >&6;}
++{ echo "$as_me:$LINENO: checking for Python headers using $PYTHON-config --includes" >&5
++echo $ECHO_N "checking for Python headers using $PYTHON-config --includes... $ECHO_C" >&6; }
 +if test "${am_cv_python_includes+set}" = set; then
 +  echo $ECHO_N "(cached) $ECHO_C" >&6
 +  PYTHON_INCLUDES=${am_cv_python_includes}
 +  { echo "$as_me:$LINENO: result: $PYTHON_INCLUDES" >&5
 +echo "${ECHO_T}$PYTHON_INCLUDES" >&6; }
+ else
+-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Python headers using $PYTHON-config --includes" >&5
+-$as_echo_n "checking for Python headers using $PYTHON-config --includes... " >&6; }
+-  PYTHON_INCLUDES=`$PYTHON-config --includes`
+-  if test $? = 0; then
+-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PYTHON_INCLUDES" >&5
+-$as_echo "$PYTHON_INCLUDES" >&6; }
+-  else
+-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: failed, will try another way" >&5
+-$as_echo "failed, will try another way" >&6; }
+-    py_prefix=`$PYTHON -c "import sys; print sys.prefix"`
+-    py_exec_prefix=`$PYTHON -c "import sys; print sys.exec_prefix"`
+-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Python headers in $py_prefix and $py_exec_prefix" >&5
+-$as_echo_n "checking for Python headers in $py_prefix and $py_exec_prefix... " >&6; }
+-    PYTHON_INCLUDES="-I${py_prefix}/include/python${PYTHON_VERSION}"
+-    if test "$py_prefix" != "$py_exec_prefix"; then
+-      PYTHON_INCLUDES="$PYTHON_INCLUDES -I${py_exec_prefix}/include/python${PYTHON_VERSION}"
+-    fi
+-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PYTHON_INCLUDES" >&5
+-$as_echo "$PYTHON_INCLUDES" >&6; }
++PYTHON_INCLUDES=`$PYTHON-config --includes`
++if test $? = 0; then
++  { echo "$as_me:$LINENO: result: $PYTHON_INCLUDES" >&5
++echo "${ECHO_T}$PYTHON_INCLUDES" >&6; }
 +else
- PYTHON_INCLUDES=`$PYTHON-config --includes`
- if test $? = 0; then
-   { echo "$as_me:$LINENO: result: $PYTHON_INCLUDES" >&5
-@@ -10194,6 +10200,7 @@
-   { echo "$as_me:$LINENO: result: $PYTHON_INCLUDES" >&5
- echo "${ECHO_T}$PYTHON_INCLUDES" >&6; }
- fi
++  { echo "$as_me:$LINENO: result: failed, will try another way" >&5
++echo "${ECHO_T}failed, will try another way" >&6; }
++  py_prefix=`$PYTHON -c "import sys; print sys.prefix"`
++  py_exec_prefix=`$PYTHON -c "import sys; print sys.exec_prefix"`
++  { echo "$as_me:$LINENO: checking for Python headers in $py_prefix and $py_exec_prefix" >&5
++echo $ECHO_N "checking for Python headers in $py_prefix and $py_exec_prefix... $ECHO_C" >&6; }
++  PYTHON_INCLUDES="-I${py_prefix}/include/python${PYTHON_VERSION}"
++  if test "$py_prefix" != "$py_exec_prefix"; then
++    PYTHON_INCLUDES="$PYTHON_INCLUDES -I${py_exec_prefix}/include/python${PYTHON_VERSION}"
+   fi
++  { echo "$as_me:$LINENO: result: $PYTHON_INCLUDES" >&5
++echo "${ECHO_T}$PYTHON_INCLUDES" >&6; }
 +fi
+ fi
  
- { echo "$as_me:$LINENO: checking whether those headers are sufficient" >&5
- echo $ECHO_N "checking whether those headers are sufficient... $ECHO_C" >&6; }
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether those headers are sufficient" >&5
