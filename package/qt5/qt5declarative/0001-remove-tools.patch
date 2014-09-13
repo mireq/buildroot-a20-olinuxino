@@ -24,7 +24,7 @@ diff -urN qtdeclarative-opensource-src-5.2.1.old/tools/tools.pro qtdeclarative-o
 -        qmlprofiler \
 -        qmlbundle
      qtHaveModule(quick) {
--        SUBDIRS += qmlscene qmlplugindump
+-        !static: SUBDIRS += qmlscene qmlplugindump
 -        qtHaveModule(widgets): SUBDIRS += qmleasing
 +        SUBDIRS += qmlscene
      }

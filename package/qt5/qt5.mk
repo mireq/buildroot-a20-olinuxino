@@ -1,5 +1,5 @@
-QT5_VERSION = 5.2.1
-QT5_SITE = http://download.qt-project.org/official_releases/qt/5.2/$(QT5_VERSION)/submodules/
+QT5_VERSION = 5.3.1
+QT5_SITE = http://download.qt-project.org/official_releases/qt/5.3/$(QT5_VERSION)/submodules/
 include package/qt5/*/*.mk
 
 define QT5_LA_PRL_FILES_FIXUP
