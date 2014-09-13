@@ -7,7 +7,7 @@ It is for my personal use.
 Try this command to achive it:
 
 #+BEGIN_SRC sh
- make a13_olinuxino_defconfig
+ make a20_olinuxino_defconfig
  make
 #+END_SRC
 
@@ -18,5 +18,5 @@ Please, if you find it useful try to use or build it.
 * Why it may be useful for you
 This is original buildroot besides that, it contains:
  - script to make sd card image
- - package to build OLIMEX UEXT modules for A13-OLinuXino
+ - package to build OLIMEX UEXT modules for A20-OLinuXino
  - other new packages (picolisp)

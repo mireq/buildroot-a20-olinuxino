@@ -15,7 +15,7 @@ fi
 
 ROOTFS_TAR="$ARG_ROOTFS_TAR"
 
-SDIMG_FILE="$ARG_OUTPUT_DIR"/a13_olinuxino.sdimg
+SDIMG_FILE="$ARG_OUTPUT_DIR"/a20_olinuxino.sdimg
 SDIMG_MB=$ARG_SDIMG_MB
 
 echo === Create empty file ===

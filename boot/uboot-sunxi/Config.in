@@ -1,5 +1,5 @@
 config BR2_TARGET_UBOOT_SUNXI
-    depends on BR2_cortex_a8
+    depends on BR2_cortex_a7
     bool "U-Boot Sunxi"
     help
       Build "Das U-Boot" Boot Monitor for Allwinner A10 & A13

@@ -1015,8 +1015,8 @@ source "package/vim/Config.in"
 endif
 endmenu
 
-if BR2_cortex_a8
-source "package/a13-olinuxino-software/Config.in"
+if BR2_cortex_a7
+source "package/a20-olinuxino-software/Config.in"
 endif
 
 endmenu

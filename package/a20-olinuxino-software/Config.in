@@ -1,0 +1,15 @@
+menu "A20 OLinuXino software"
+
+config BR2_PACKAGE_A20_OLINUXINO_SOFTWARE
+    bool "A20-OLinuXino software"
+
+if BR2_PACKAGE_A20_OLINUXINO_SOFTWARE
+    
+config BR2_PACKAGE_A20_OLINUXINO_SOFTWARE_MOD_RTC
+    bool "mod-rtc"
+    help
+      Program to work with MOD-RTC with UEXT connector.
+      
+endif
+
+endmenu

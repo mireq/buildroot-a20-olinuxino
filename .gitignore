@@ -1,4 +1,4 @@
-board/a13_olinuxino/wpa_supplicant.conf
+board/a20_olinuxino/wpa_supplicant.conf
 /output
 /dl
 /.auto.deps
