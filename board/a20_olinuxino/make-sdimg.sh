@@ -87,18 +87,18 @@ echo "  " bootloader
 
 MOUNT=`mktemp -d`
 
-tar -xf $ROOTFS_TAR -C $MOUNT --strip=2 './boot/u-boot.bin' './boot/sunxi-spl.bin'
+tar -xf $ROOTFS_TAR -C $MOUNT --strip=2 './boot/u-boot.bin' './boot/u-boot.img' './boot/sunxi-spl.bin'
 
 losetup $LOOP $SDIMG_FILE
 dd if=$MOUNT/sunxi-spl.bin of=$LOOP bs=1024 seek=8  > /dev/null 2>&1
-dd if=$MOUNT/u-boot.bin of=$LOOP bs=1024 seek=32  > /dev/null 2>&1
+dd if=$MOUNT/u-boot.img of=$LOOP bs=1024 seek=40  > /dev/null 2>&1
 sync
 losetup -d $LOOP
 
 echo "  " boot
 
 mount -o loop,sizelimit=$PARTITION_BOOT_SIZE,offset=$PARTITION_BOOT_OFFSET $SDIMG_FILE $MOUNT
-tar -xf $ROOTFS_TAR -C $MOUNT --strip=2 --wildcards './boot/*' --exclude './boot/u-boot.bin' --exclude './boot/sunxi-spl.bin'
+tar -xf $ROOTFS_TAR -C $MOUNT --strip=2 --wildcards './boot/*' --exclude './boot/u-boot.bin' --exclude './boot/u-boot.img' --exclude './boot/sunxi-spl.bin'
 sync
 umount $MOUNT
 
