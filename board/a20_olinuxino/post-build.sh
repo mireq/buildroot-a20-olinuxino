@@ -16,6 +16,13 @@ then
 
 fi
 
+if [ -e $BINARIES_DIR/u-boot.img ];
+then
+
+    cp $BINARIES_DIR/u-boot.img $BOOT
+
+fi
+
 if [ -e $BINARIES_DIR/sunxi-spl.bin ];
 then
 
