@@ -1,0 +1,20 @@
+--- old/src/platformsupport/input/evdevtouch/qevdevtouch.cpp	2014-10-04 15:57:19.812329227 +0200
++++ new/src/platformsupport/input/evdevtouch/qevdevtouch.cpp	2014-10-04 15:57:11.315708591 +0200
+@@ -434,7 +434,7 @@
+     if (data->type == EV_ABS) {
+ 
+         if (data->code == ABS_MT_POSITION_X || (m_singleTouch && data->code == ABS_X)) {
+-            m_currentData.x = qBound(hw_range_x_min, data->value, hw_range_x_max);
++            m_currentData.x = qBound(qMin(hw_range_x_min, hw_range_x_max), data->value, qMax(hw_range_x_max, hw_range_x_min));
+             if (m_singleTouch)
+                 m_contacts[m_currentSlot].x = m_currentData.x;
+             if (m_typeB) {
+@@ -443,7 +443,7 @@
+                     m_contacts[m_currentSlot].state = Qt::TouchPointMoved;
+             }
+         } else if (data->code == ABS_MT_POSITION_Y || (m_singleTouch && data->code == ABS_Y)) {
+-            m_currentData.y = qBound(hw_range_y_min, data->value, hw_range_y_max);
++            m_currentData.y = qBound(qMin(hw_range_y_min, hw_range_y_max), data->value, qMax(hw_range_y_max, hw_range_y_min));
+             if (m_singleTouch)
+                 m_contacts[m_currentSlot].y = m_currentData.y;
+                 if (m_typeB) {
