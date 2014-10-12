@@ -1,0 +1,8 @@
+config BR2_PACKAGE_LIBCONNMAN_QT
+	bool "libconnman-qt"
+	select BR2_PACKAGE_QT5BASE
+	depends on BR2_PACKAGE_CONNMAN
+	help
+	  The Qt bindings are direct reflection of ConnMan's D-Bus interfaces
+
+	  https://github.com/nemomobile/libconnman-qt
