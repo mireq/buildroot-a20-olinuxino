@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-PERL_VERSION_MAJOR = 18
+PERL_VERSION_MAJOR = 20
 PERL_VERSION = 5.$(PERL_VERSION_MAJOR).1
 PERL_SITE = http://www.cpan.org/src/5.0
 PERL_SOURCE = perl-$(PERL_VERSION).tar.bz2
@@ -12,10 +12,11 @@ PERL_LICENSE = Artistic or GPLv1+
 PERL_LICENSE_FILES = Artistic Copying README
 PERL_INSTALL_STAGING = YES
 
-PERL_CROSS_VERSION = 0.8.3
+PERL_CROSS_VERSION = 0.9.4
 PERL_CROSS_BASE_VERSION = 5.$(PERL_VERSION_MAJOR).1
-PERL_CROSS_SITE    = http://download.berlios.de/perlcross
-PERL_CROSS_SOURCE  = perl-$(PERL_CROSS_BASE_VERSION)-cross-$(PERL_CROSS_VERSION).tar.gz
+# DO NOT refactor with the github helper (the result is not the same)
+PERL_CROSS_SITE = http://raw.github.com/arsv/perl-cross/releases
+PERL_CROSS_SOURCE = perl-$(PERL_CROSS_BASE_VERSION)-cross-$(PERL_CROSS_VERSION).tar.gz
 PERL_CROSS_OLD_POD = perl$(subst .,,$(PERL_CROSS_BASE_VERSION))delta.pod
 PERL_CROSS_NEW_POD = perl$(subst .,,$(PERL_VERSION))delta.pod
 
@@ -41,16 +42,16 @@ endef
 PERL_POST_PATCH_HOOKS += PERL_CROSS_SET_POD
 
 ifeq ($(BR2_PACKAGE_BERKELEYDB),y)
-    PERL_DEPENDENCIES += berkeleydb
+PERL_DEPENDENCIES += berkeleydb
 endif
 ifeq ($(BR2_PACKAGE_GDBM),y)
-    PERL_DEPENDENCIES += gdbm
+PERL_DEPENDENCIES += gdbm
 endif
 
 # We have to override LD, because an external multilib toolchain ld is not
 # wrapped to provide the required sysroot options.  We also can't use ccache
 # because the configure script doesn't support it.
-PERL_CONF_OPT = \
+PERL_CONF_OPTS = \
 	--target=$(GNU_TARGET_NAME) \
 	--target-tools-prefix=$(TARGET_CROSS) \
 	--prefix=/usr \
@@ -65,41 +66,70 @@ PERL_CONF_OPT = \
 	-Dperladmin=root
 
 ifeq ($(shell expr $(PERL_VERSION_MAJOR) % 2), 1)
-    PERL_CONF_OPT += -Dusedevel
+PERL_CONF_OPTS += -Dusedevel
+endif
+
+ifeq ($(BR2_STATIC_LIBS),y)
+PERL_CONF_OPTS += --all-static --no-dynaloader
 endif
 
 ifneq ($(BR2_LARGEFILE),y)
-    PERL_CONF_OPT += -Uuselargefiles
+PERL_CONF_OPTS += -Uuselargefiles
 endif
 
 PERL_MODULES = $(call qstrip,$(BR2_PACKAGE_PERL_MODULES))
 ifneq ($(PERL_MODULES),)
-PERL_CONF_OPT += --only-mod=$(subst $(space),$(comma),$(PERL_MODULES))
+PERL_CONF_OPTS += --only-mod=$(subst $(space),$(comma),$(PERL_MODULES))
 endif
 
 define PERL_CONFIGURE_CMDS
-	(cd $(@D); HOSTCC='$(HOSTCC_NOCACHE)' ./configure $(PERL_CONF_OPT))
+	(cd $(@D); HOSTCC='$(HOSTCC_NOCACHE)' ./configure $(PERL_CONF_OPTS))
 	$(SED) 's/UNKNOWN-/Buildroot $(BR2_VERSION_FULL) /' $(@D)/patchlevel.h
 endef
 
-# perlcross's miniperl_top forgets base, which is required by mktables.
-# Instead of patching, it's easier to just set PERL5LIB
 define PERL_BUILD_CMDS
-	PERL5LIB=$(@D)/dist/base/lib $(MAKE1) -C $(@D) perl modules
+	$(MAKE1) -C $(@D) all
 endef
 
 define PERL_INSTALL_STAGING_CMDS
-	PERL5LIB=$(@D)/dist/base/lib $(MAKE1) -C $(@D) DESTDIR="$(STAGING_DIR)" install.perl
+	$(MAKE1) -C $(@D) DESTDIR="$(STAGING_DIR)" install.perl
 endef
 
-PERL_INSTALL_TARGET_GOALS = install.perl
-ifeq ($(BR2_HAVE_DOCUMENTATION),y)
-PERL_INSTALL_TARGET_GOALS += install.man
-endif
-
-
 define PERL_INSTALL_TARGET_CMDS
-	PERL5LIB=$(@D)/dist/base/lib $(MAKE1) -C $(@D) DESTDIR="$(TARGET_DIR)" $(PERL_INSTALL_TARGET_GOALS)
+	$(MAKE1) -C $(@D) DESTDIR="$(TARGET_DIR)" install.perl
+endef
+
+# We never want to have host-berkeleydb or host-gdbm as dependencies
+# of host-perl.
+HOST_PERL_DEPENDENCIES =
+
+HOST_PERL_CONF_OPTS = \
+	-des \
+	-Dprefix="$(HOST_DIR)/usr" \
+	-Dcc="$(HOSTCC)"
+
+define HOST_PERL_CONFIGURE_CMDS
+	(cd $(@D); HOSTCC='$(HOSTCC_NOCACHE)' ./Configure $(HOST_PERL_CONF_OPTS))
+endef
+
+define HOST_PERL_BUILD_CMDS
+	$(MAKE) -C $(@D)
+endef
+
+define HOST_PERL_INSTALL_CMDS
+	$(MAKE) -C $(@D) INSTALL_DEPENDENCE='' install
 endef
 
 $(eval $(generic-package))
+$(eval $(host-generic-package))
+
+define PERL_FINALIZE_TARGET
+	rm -rf $(TARGET_DIR)/usr/lib/perl5/$(PERL_VERSION)/pod
+	rm -rf $(TARGET_DIR)/usr/lib/perl5/$(PERL_VERSION)/$(PERL_ARCHNAME)/CORE
+	find $(TARGET_DIR)/usr/lib/perl5/ -name 'extralibs.ld' -print0 | xargs -0 rm -f
+	find $(TARGET_DIR)/usr/lib/perl5/ -name '*.bs' -print0 | xargs -0 rm -f
+	find $(TARGET_DIR)/usr/lib/perl5/ -name '.packlist' -print0 | xargs -0 rm -f
+endef
+
+TARGET_FINALIZE_HOOKS += PERL_FINALIZE_TARGET
+

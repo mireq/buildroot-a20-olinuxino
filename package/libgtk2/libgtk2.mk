@@ -5,13 +5,14 @@
 ################################################################################
 
 LIBGTK2_VERSION_MAJOR = 2.24
-LIBGTK2_VERSION_MINOR = 18
-LIBGTK2_VERSION = $(LIBGTK2_VERSION_MAJOR).$(LIBGTK2_VERSION_MINOR)
+LIBGTK2_VERSION = $(LIBGTK2_VERSION_MAJOR).18
 
 LIBGTK2_SOURCE = gtk+-$(LIBGTK2_VERSION).tar.xz
 LIBGTK2_SITE = http://ftp.gnome.org/pub/gnome/sources/gtk+/$(LIBGTK2_VERSION_MAJOR)
 LIBGTK2_INSTALL_STAGING = YES
 LIBGTK2_INSTALL_TARGET = YES
+LIBGTK2_LICENSE = LGPLv2+
+LIBGTK2_LICENSE_FILES = COPYING
 
 LIBGTK2_AUTORECONF = YES
 
@@ -68,14 +69,12 @@ LIBGTK2_CONF_ENV = ac_cv_func_posix_getpwuid_r=yes glib_cv_stack_grows=no \
 		ac_cv_prog_F77=no \
 		ac_cv_path_CUPS_CONFIG=no
 
-LIBGTK2_CONF_OPT = --disable-glibtest \
-		--enable-explicit-deps=no \
-		--disable-debug
+LIBGTK2_CONF_OPTS = --disable-glibtest --enable-explicit-deps=no
 
 LIBGTK2_DEPENDENCIES = host-pkgconf host-libgtk2 libglib2 cairo pango atk gdk-pixbuf
 
 # Xorg dependencies
-LIBGTK2_CONF_OPT += \
+LIBGTK2_CONF_OPTS += \
 	--with-x \
 	--x-includes=$(STAGING_DIR)/usr/include/X11 \
 	--x-libraries=$(STAGING_DIR)/usr/lib \
@@ -84,17 +83,17 @@ LIBGTK2_DEPENDENCIES += xlib_libXcomposite fontconfig xlib_libX11 \
 	xlib_libXext xlib_libXrender
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBXINERAMA),y)
-	LIBGTK2_CONF_OPT += --enable-xinerama
+	LIBGTK2_CONF_OPTS += --enable-xinerama
 	LIBGTK2_DEPENDENCIES += xlib_libXinerama
 else
-	LIBGTK2_CONF_OPT += --disable-xinerama
+	LIBGTK2_CONF_OPTS += --disable-xinerama
 endif
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBXI),y)
-	LIBGTK2_CONF_OPT += --with-xinput=yes
+	LIBGTK2_CONF_OPTS += --with-xinput=yes
 	LIBGTK2_DEPENDENCIES += xlib_libXi
 else
-	LIBGTK2_CONF_OPT += --with-xinput=no
+	LIBGTK2_CONF_OPTS += --with-xinput=no
 endif
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBXRANDR),y)
@@ -120,25 +119,25 @@ endif
 ifeq ($(BR2_PACKAGE_LIBPNG),y)
 LIBGTK2_DEPENDENCIES += libpng
 else
-LIBGTK2_CONF_OPT += --without-libpng
+LIBGTK2_CONF_OPTS += --without-libpng
 endif
 
 ifeq ($(BR2_PACKAGE_JPEG),y)
 LIBGTK2_DEPENDENCIES += jpeg
 else
-LIBGTK2_CONF_OPT += --without-libjpeg
+LIBGTK2_CONF_OPTS += --without-libjpeg
 endif
 
 ifeq ($(BR2_PACKAGE_TIFF),y)
 LIBGTK2_DEPENDENCIES += tiff
 else
-LIBGTK2_CONF_OPT += --without-libtiff
+LIBGTK2_CONF_OPTS += --without-libtiff
 endif
 
 ifeq ($(BR2_PACKAGE_CUPS),y)
 LIBGTK2_DEPENDENCIES += cups
 else
-LIBGTK2_CONF_OPT += --disable-cups
+LIBGTK2_CONF_OPTS += --disable-cups
 endif
 
 ifeq ($(BR2_PACKAGE_LIBGTK2_DEMO),)
@@ -157,21 +156,20 @@ endif
 # for the target.
 
 HOST_LIBGTK2_DEPENDENCIES = host-libglib2 host-libpng host-gdk-pixbuf
-HOST_LIBGTK2_CONF_OPT = \
+HOST_LIBGTK2_CONF_OPTS = \
 		--disable-static \
 		--disable-glibtest \
 		--without-libtiff \
 		--without-libjpeg \
 		--with-gdktarget=none \
-		--disable-cups \
-		--disable-debug
+		--disable-cups
 
 define HOST_LIBGTK2_BUILD_CMDS
- $(HOST_MAKE_ENV) make -C $(@D)/gtk gtk-update-icon-cache
+	$(HOST_MAKE_ENV) make -C $(@D)/gtk gtk-update-icon-cache
 endef
 
 define HOST_LIBGTK2_INSTALL_CMDS
- cp $(@D)/gtk/gtk-update-icon-cache $(HOST_DIR)/usr/bin
+	cp $(@D)/gtk/gtk-update-icon-cache $(HOST_DIR)/usr/bin
 endef
 
 $(eval $(autotools-package))

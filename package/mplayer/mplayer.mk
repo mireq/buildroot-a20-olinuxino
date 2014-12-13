@@ -14,9 +14,9 @@ MPLAYER_LDFLAGS = $(TARGET_LDFLAGS)
 # mplayer needs pcm+mixer support, but configure fails to check for it
 ifeq ($(BR2_PACKAGE_ALSA_LIB)$(BR2_PACKAGE_ALSA_LIB_MIXER)$(BR2_PACKAGE_ALSA_LIB_PCM),yyy)
 MPLAYER_DEPENDENCIES += alsa-lib
-MPLAYER_CONF_OPTS    += --enable-alsa
+MPLAYER_CONF_OPTS += --enable-alsa
 else
-MPLAYER_CONF_OPTS    += --disable-alsa
+MPLAYER_CONF_OPTS += --disable-alsa
 endif
 
 ifeq ($(BR2_ENDIAN),"BIG")
@@ -92,7 +92,7 @@ MPLAYER_DEPENDENCIES += live555
 MPLAYER_CONF_OPTS += --enable-live
 MPLAYER_LIVE555 = liveMedia groupsock UsageEnvironment BasicUsageEnvironment
 MPLAYER_CFLAGS += \
-	$(addprefix -I$(STAGING_DIR)/usr/include/live/,$(MPLAYER_LIVE555))
+	$(addprefix -I$(STAGING_DIR)/usr/include/,$(MPLAYER_LIVE555))
 MPLAYER_LDFLAGS += $(addprefix -l,$(MPLAYER_LIVE555)) -lstdc++
 else
 MPLAYER_CONF_OPTS += --disable-live
@@ -105,16 +105,19 @@ MPLAYER_DEPENDENCIES += $(if $(BR2_PACKAGE_XLIB_LIBX11),xlib_libX11)
 MPLAYER_DEPENDENCIES += $(if $(BR2_PACKAGE_XLIB_LIBXV),xlib_libXv)
 
 # ARM optimizations
-ifeq ($(call qstrip,$(BR2_GCC_TARGET_ARCH)),armv5te)
+ifeq ($(BR2_ARM_CPU_ARMV5),y)
 MPLAYER_CONF_OPTS += --enable-armv5te
 endif
 
-ifeq ($(call qstrip,$(BR2_GCC_TARGET_ARCH)),armv6j)
+ifeq ($(BR2_ARM_CPU_ARMV6)$(BR2_ARM_CPU_ARMV7A),y)
 MPLAYER_CONF_OPTS += --enable-armv6
 endif
 
+ifeq ($(BR2_ARM_SOFT_FLOAT),)
 ifeq ($(BR2_ARM_CPU_HAS_NEON),y)
 MPLAYER_CONF_OPTS += --enable-neon
+MPLAYER_CFLAGS += -mfpu=neon
+endif
 endif
 
 ifeq ($(BR2_i386),y)

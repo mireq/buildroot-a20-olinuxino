@@ -4,32 +4,34 @@
 #
 ################################################################################
 
-LFTP_VERSION = 4.4.10
-LFTP_SITE    = http://lftp.yar.ru/ftp
+LFTP_VERSION = 4.5.5
+LFTP_SITE = http://lftp.yar.ru/ftp
 LFTP_LICENSE = GPLv3+
 LFTP_LICENSE_FILES = COPYING
 LFTP_AUTORECONF = YES
-LFTP_DEPENDENCIES  = readline zlib
+LFTP_DEPENDENCIES = readline zlib host-pkgconf
 
-LFTP_CONF_OPT += --with-modules
+ifneq ($(BR2_STATIC_LIBS),y)
+LFTP_CONF_OPTS += --with-modules
+endif
 
 ifeq ($(BR2_PACKAGE_GNUTLS),y)
 LFTP_DEPENDENCIES += gnutls
-LFTP_CONF_OPT += --with-gnutls
+LFTP_CONF_OPTS += --with-gnutls
 else
-LFTP_CONF_OPT += --without-gnutls
+LFTP_CONF_OPTS += --without-gnutls
 endif
 
 ifeq ($(BR2_PACKAGE_OPENSSL),y)
 LFTP_DEPENDENCIES += openssl
-LFTP_CONF_OPT += --with-openssl
+LFTP_CONF_OPTS += --with-openssl
 else
-LFTP_CONF_OPT += --without-openssl
+LFTP_CONF_OPTS += --without-openssl
 endif
 
 # Remove /usr/share/lftp
 define LFTP_REMOVE_DATA
-        $(RM) -fr $(TARGET_DIR)/usr/share/lftp
+	$(RM) -fr $(TARGET_DIR)/usr/share/lftp
 endef
 
 LFTP_POST_INSTALL_TARGET_HOOKS += LFTP_REMOVE_DATA

@@ -4,19 +4,24 @@
 #
 ################################################################################
 
-OPROFILE_VERSION = 0.9.8
+OPROFILE_VERSION = 0.9.9
 OPROFILE_SITE = http://downloads.sourceforge.net/project/oprofile/oprofile/oprofile-$(OPROFILE_VERSION)
 OPROFILE_LICENSE = GPLv2+
 OPROFILE_LICENSE_FILES = COPYING
-OPROFILE_CONF_OPT = \
-	--localstatedir=/var \
+OPROFILE_CONF_OPTS = \
 	--disable-account-check \
 	--enable-gui=no \
 	--with-kernel=$(STAGING_DIR)/usr
 OPROFILE_AUTORECONF = YES
 OPROFILE_BINARIES = utils/ophelp pp/opannotate pp/oparchive pp/opgprof
 OPROFILE_BINARIES += pp/opreport opjitconv/opjitconv daemon/oprofiled
-OPROFILE_BINARIES += utils/op-check-perfevents pe_profiling/operf libabi/opimport
+OPROFILE_BINARIES += utils/op-check-perfevents libabi/opimport
+OPROFILE_BINARIES += pe_counting/ocount
+
+# No perf_events support in kernel for avr32
+ifneq ($(BR2_avr32),y)
+OPROFILE_BINARIES += pe_profiling/operf
+endif
 
 ifeq ($(BR2_i386),y)
 OPROFILE_ARCH = i386

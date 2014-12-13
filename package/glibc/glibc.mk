@@ -4,45 +4,33 @@
 #
 ################################################################################
 
-ifeq ($(BR2_microblaze),y)
+GLIBC_VERSION = $(call qstrip,$(BR2_GLIBC_VERSION_STRING))
+
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT_EGLIBC),y)
-GLIBC_VERSION = 7f0bcce417c47aefad06ddfec7cd4ced3a4e10ff
-GLIBC_SITE = $(call github,Xilinx,eglibc,$(GLIBC_VERSION))
-GLIBC_SRC_SUBDIR = .
-else
-GLIBC_VERSION = b86835ca92a1942ed08d8b5ee47498e711feaddb
-GLIBC_SITE = $(call github,Xilinx,glibc,$(GLIBC_VERSION))
-GLIBC_SRC_SUBDIR = .
-endif
-else
-ifeq ($(BR2_TOOLCHAIN_BUILDROOT_EGLIBC),y)
-GLIBC_VERSION = 2.18-svnr23787
-GLIBC_SITE = http://downloads.yoctoproject.org/releases/eglibc/
+GLIBC_SITE = http://downloads.yoctoproject.org/releases/eglibc
 GLIBC_SOURCE = eglibc-$(GLIBC_VERSION).tar.bz2
 GLIBC_SRC_SUBDIR = libc
 else
-GLIBC_VERSION = 2.18
 GLIBC_SITE = $(BR2_GNU_MIRROR)/libc
 GLIBC_SOURCE = glibc-$(GLIBC_VERSION).tar.xz
 GLIBC_SRC_SUBDIR = .
-endif
 endif
 
 GLIBC_LICENSE = GPLv2+ (programs), LGPLv2.1+, BSD-3c, MIT (library)
 GLIBC_LICENSE_FILES = $(addprefix $(GLIBC_SRC_SUBDIR)/,COPYING COPYING.LIB LICENSES)
 
+# glibc is part of the toolchain so disable the toolchain dependency
+GLIBC_ADD_TOOLCHAIN_DEPENDENCY = NO
+
 # Before (e)glibc is configured, we must have the first stage
 # cross-compiler and the kernel headers
 GLIBC_DEPENDENCIES = host-gcc-initial linux-headers host-gawk
-
-# Before (e)glibc is built, we must have the second stage cross-compiler
-glibc-build: host-gcc-intermediate
 
 GLIBC_SUBDIR = build
 
 GLIBC_INSTALL_STAGING = YES
 
-GLIBC_INSTALL_STAGING_OPT = install_root=$(STAGING_DIR) install
+GLIBC_INSTALL_STAGING_OPTS = install_root=$(STAGING_DIR) install
 
 # Thumb build is broken, build in ARM mode
 ifeq ($(BR2_ARM_INSTRUCTIONS_THUMB),y)
@@ -91,6 +79,7 @@ define GLIBC_CONFIGURE_CMDS
 		$(SHELL) $(@D)/$(GLIBC_SRC_SUBDIR)/configure \
 		ac_cv_path_BASH_SHELL=/bin/bash \
 		libc_cv_forced_unwind=yes \
+		libc_cv_ssp=no \
 		--target=$(GNU_TARGET_NAME) \
 		--host=$(GNU_TARGET_NAME) \
 		--build=$(GNU_HOST_NAME) \
@@ -103,18 +92,7 @@ define GLIBC_CONFIGURE_CMDS
 		--without-gd \
 		--enable-obsolete-rpc \
 		--with-headers=$(STAGING_DIR)/usr/include)
-	# Install headers and start files
-	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)/build \
-		install_root=$(STAGING_DIR) \
-		install-bootstrap-headers=yes \
-		install-headers
-	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)/build csu/subdir_lib
-	cp $(@D)/build/csu/crt1.o $(STAGING_DIR)/usr/lib/
-	cp $(@D)/build/csu/crti.o $(STAGING_DIR)/usr/lib/
-	cp $(@D)/build/csu/crtn.o $(STAGING_DIR)/usr/lib/
 	$(GLIBC_ADD_MISSING_STUB_H)
-	$(TARGET_CROSS)gcc -nostdlib \
-		-nostartfiles -shared -x c /dev/null -o $(STAGING_DIR)/usr/lib/libc.so
 endef
 
 

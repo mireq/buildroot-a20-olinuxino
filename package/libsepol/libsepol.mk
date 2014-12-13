@@ -5,24 +5,30 @@
 ################################################################################
 
 LIBSEPOL_VERSION = 2.1.9
-LIBSEPOL_SITE = http://userspace.selinuxproject.org/releases/20130423/
+LIBSEPOL_SITE = http://userspace.selinuxproject.org/releases/20130423
 LIBSEPOL_LICENSE = LGPLv2.1+
 LIBSEPOL_LICENSE_FILES = COPYING
 
 LIBSEPOL_INSTALL_STAGING = YES
 
+LIBSEPOL_MAKE_FLAGS = $(TARGET_CONFIGURE_OPTS)
+
+ifeq ($(BR2_STATIC_LIBS),y)
+LIBSEPOL_MAKE_FLAGS += STATIC=1
+endif
+
 define LIBSEPOL_BUILD_CMDS
 	# DESTDIR is needed during the compile to compute library and
 	# header paths.
-	$(MAKE) -C $(@D) $(TARGET_CONFIGURE_OPTS) DESTDIR=$(STAGING_DIR)
+	$(MAKE) -C $(@D) $(LIBSEPOL_MAKE_FLAGS) DESTDIR=$(STAGING_DIR)
 endef
 
 define LIBSEPOL_INSTALL_STAGING_CMDS
-	$(MAKE) -C $(@D) install $(TARGET_CONFIGURE_OPTS) DESTDIR=$(STAGING_DIR)
+	$(MAKE) -C $(@D) install $(LIBSEPOL_MAKE_FLAGS) DESTDIR=$(STAGING_DIR)
 endef
 
 define LIBSEPOL_INSTALL_TARGET_CMDS
-	$(MAKE) -C $(@D) install $(TARGET_CONFIGURE_OPTS) DESTDIR=$(TARGET_DIR)
+	$(MAKE) -C $(@D) install $(LIBSEPOL_MAKE_FLAGS) DESTDIR=$(TARGET_DIR)
 endef
 
 define HOST_LIBSEPOL_BUILD_CMDS

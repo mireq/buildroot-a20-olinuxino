@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-SQLITE_VERSION = 3080100
+SQLITE_VERSION = 3080704
 SQLITE_SOURCE = sqlite-autoconf-$(SQLITE_VERSION).tar.gz
-SQLITE_SITE = http://www.sqlite.org/2013
+SQLITE_SITE = http://www.sqlite.org/2014
 SQLITE_LICENSE = Public domain
 SQLITE_INSTALL_STAGING = YES
 
@@ -33,30 +33,27 @@ ifeq ($(BR2_PACKAGE_SQLITE_SECURE_DELETE),y)
 SQLITE_CFLAGS += -DSQLITE_SECURE_DELETE
 endif
 
-ifeq ($(BR2_xtensa),y)
-SQLITE_CFLAGS += -mtext-section-literals
+ifeq ($(BR2_PACKAGE_SQLITE_NO_SYNC),y)
+SQLITE_CFLAGS += -DSQLITE_NO_SYNC
 endif
 
 SQLITE_CONF_ENV = CFLAGS="$(TARGET_CFLAGS) $(SQLITE_CFLAGS)"
 
-SQLITE_CONF_OPT = \
-	--localstatedir=/var
-
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
-SQLITE_CONF_OPT += --enable-dynamic-extensions=no
+ifeq ($(BR2_STATIC_LIBS),y)
+SQLITE_CONF_OPTS += --enable-dynamic-extensions=no
 endif
 
 ifeq ($(BR2_TOOLCHAIN_HAS_THREADS),y)
-SQLITE_CONF_OPT += --enable-threadsafe
+SQLITE_CONF_OPTS += --enable-threadsafe
 else
-SQLITE_CONF_OPT += --disable-threadsafe
+SQLITE_CONF_OPTS += --disable-threadsafe
 endif
 
 ifeq ($(BR2_PACKAGE_SQLITE_READLINE),y)
 SQLITE_DEPENDENCIES += ncurses readline
-SQLITE_CONF_OPT += --with-readline-inc="-I$(STAGING_DIR)/usr/include"
+SQLITE_CONF_OPTS += --with-readline-inc="-I$(STAGING_DIR)/usr/include"
 else
-SQLITE_CONF_OPT += --disable-readline
+SQLITE_CONF_OPTS += --disable-readline
 endif
 
 $(eval $(autotools-package))

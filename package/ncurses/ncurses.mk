@@ -12,10 +12,9 @@ HOST_NCURSES_DEPENDENCIES =
 NCURSES_PROGS = clear infocmp tabs tic toe tput tset
 NCURSES_LICENSE = MIT with advertising clause
 NCURSES_LICENSE_FILES = README
-NCURSES_CONFIG_SCRIPTS = ncurses5-config
+NCURSES_CONFIG_SCRIPTS = ncurses$(NCURSES_LIB_SUFFIX)5-config
 
-NCURSES_CONF_OPT = \
-	$(if $(BR2_PREFER_STATIC_LIB),--without-shared,--with-shared) \
+NCURSES_CONF_OPTS = \
 	--without-cxx \
 	--without-cxx-binding \
 	--without-ada \
@@ -29,41 +28,80 @@ NCURSES_CONF_OPT = \
 	--enable-overwrite \
 	--enable-pc-files \
 	$(if $(BR2_PACKAGE_NCURSES_TARGET_PROGS),,--without-progs) \
-	$(if $(BR2_HAVE_DOCUMENTATION),,--without-manpages)
+	--without-manpages
 
 # Install after busybox for the full-blown versions
 ifeq ($(BR2_PACKAGE_BUSYBOX),y)
 	NCURSES_DEPENDENCIES += busybox
 endif
 
+ifeq ($(BR2_STATIC_LIBS),y)
+NCURSES_CONF_OPTS += --without-shared --with-normal
+else ifeq ($(BR2_SHARED_LIBS),y)
+NCURSES_CONF_OPTS += --with-shared --without-normal
+else ifeq ($(BR2_SHARED_STATIC_LIBS),y)
+NCURSES_CONF_OPTS += --with-shared --with-normal
+endif
+
+ifeq ($(BR2_PACKAGE_NCURSES_WCHAR),y)
+NCURSES_CONF_OPTS += --enable-widec
+NCURSES_LIB_SUFFIX = w
+
+ifeq ($(BR2_STATIC_LIBS),y)
+define NCURSES_LINK_LIBS
+	for lib in $(NCURSES_LIBS-y); do \
+		ln -sf $${lib}$(NCURSES_LIB_SUFFIX).a \
+			$(1)/usr/lib/$${lib}.a; \
+	done
+	ln -sf libncurses$(NCURSES_LIB_SUFFIX).a \
+		$(1)/usr/lib/libcurses.a
+endef
+else
+define NCURSES_LINK_LIBS
+	for lib in $(NCURSES_LIBS-y); do \
+		ln -sf $${lib}$(NCURSES_LIB_SUFFIX).a \
+			$(1)/usr/lib/$${lib}.a; \
+		ln -sf $${lib}$(NCURSES_LIB_SUFFIX).so \
+			$(1)/usr/lib/$${lib}.so; \
+	done
+	ln -sf libncurses$(NCURSES_LIB_SUFFIX).a \
+		$(1)/usr/lib/libcurses.a
+	ln -sf libncurses$(NCURSES_LIB_SUFFIX).so \
+		$(1)/usr/lib/libcurses.so
+endef
+endif
+
+NCURSES_LINK_TARGET_LIBS = $(call NCURSES_LINK_LIBS, $(TARGET_DIR))
+NCURSES_LINK_STAGING_LIBS = $(call NCURSES_LINK_LIBS, $(STAGING_DIR))
+
+NCURSES_POST_INSTALL_STAGING_HOOKS += NCURSES_LINK_STAGING_LIBS
+
+endif
+
+NCURSES_LIBS-y = libncurses
+NCURSES_LIBS-$(BR2_PACKAGE_NCURSES_TARGET_MENU) += libmenu
+NCURSES_LIBS-$(BR2_PACKAGE_NCURSES_TARGET_PANEL) += libpanel
+NCURSES_LIBS-$(BR2_PACKAGE_NCURSES_TARGET_FORM) += libform
+
 ifneq ($(BR2_ENABLE_DEBUG),y)
-NCURSES_CONF_OPT += --without-debug
+NCURSES_CONF_OPTS += --without-debug
 endif
 
+# ncurses breaks with parallel build, but takes quite a while to
+# build single threaded. Work around it similar to how Gentoo does
 define NCURSES_BUILD_CMDS
-	$(MAKE1) -C $(@D) DESTDIR=$(STAGING_DIR)
+	$(MAKE1) -C $(@D) DESTDIR=$(STAGING_DIR) sources
+	rm -rf $(@D)/misc/pc-files
+	$(MAKE) -C $(@D) DESTDIR=$(STAGING_DIR)
 endef
 
-ifneq ($(BR2_PREFER_STATIC_LIB),y)
-
-ifeq ($(BR2_PACKAGE_NCURSES_TARGET_PANEL),y)
-define NCURSES_INSTALL_TARGET_PANEL
-	cp -dpf $(NCURSES_DIR)/lib/libpanel.so* $(TARGET_DIR)/usr/lib/
+ifneq ($(BR2_STATIC_LIBS),y)
+define NCURSES_INSTALL_TARGET_LIBS
+	for lib in $(NCURSES_LIBS-y); do \
+		cp -dpf $(NCURSES_DIR)/lib/$${lib}$(NCURSES_LIB_SUFFIX).so* \
+			$(TARGET_DIR)/usr/lib/; \
+	done
 endef
-endif
-
-ifeq ($(BR2_PACKAGE_NCURSES_TARGET_FORM),y)
-define NCURSES_INSTALL_TARGET_FORM
-	cp -dpf $(NCURSES_DIR)/lib/libform.so* $(TARGET_DIR)/usr/lib/
-endef
-endif
-
-ifeq ($(BR2_PACKAGE_NCURSES_TARGET_MENU),y)
-define NCURSES_INSTALL_TARGET_MENU
-	cp -dpf $(NCURSES_DIR)/lib/libmenu.so* $(TARGET_DIR)/usr/lib/
-endef
-endif
-
 endif
 
 ifeq ($(BR2_PACKAGE_NCURSES_TARGET_PROGS),y)
@@ -78,10 +116,8 @@ endif
 
 define NCURSES_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/lib
-	$(if $(BR2_PREFER_STATIC_LIB),,cp -dpf $(NCURSES_DIR)/lib/libncurses.so* $(TARGET_DIR)/usr/lib/)
-	$(NCURSES_INSTALL_TARGET_PANEL)
-	$(NCURSES_INSTALL_TARGET_FORM)
-	$(NCURSES_INSTALL_TARGET_MENU)
+	$(NCURSES_INSTALL_TARGET_LIBS)
+	$(NCURSES_LINK_TARGET_LIBS)
 	$(NCURSES_INSTALL_TARGET_PROGS)
 	ln -snf /usr/share/terminfo $(TARGET_DIR)/usr/lib/terminfo
 	mkdir -p $(TARGET_DIR)/usr/share/terminfo/x
@@ -111,12 +147,13 @@ define HOST_NCURSES_BUILD_CMDS
 	$(MAKE) -C $(@D)/progs tic
 endef
 
-HOST_NCURSES_CONF_OPT = \
+HOST_NCURSES_CONF_OPTS = \
 	--with-shared --without-gpm \
 	--without-manpages \
 	--without-cxx \
 	--without-cxx-binding \
-	--without-ada
+	--without-ada \
+	--without-normal
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

@@ -6,11 +6,11 @@
 
 DHRYSTONE_VERSION = 2
 DHRYSTONE_SOURCE = dhry-c
-DHRYSTONE_SITE = http://www.netlib.org/benchmark/
+DHRYSTONE_SITE = http://www.netlib.org/benchmark
 
 define DHRYSTONE_EXTRACT_CMDS
 	(cd $(@D) && $(SHELL) $(DL_DIR)/$($(PKG)_SOURCE))
-	$(Q)cp $($(PKG)_DIR_PREFIX)/dhrystone/Makefile $(@D)/
+	$(Q)cp package/dhrystone/Makefile $(@D)/
 endef
 
 define DHRYSTONE_BUILD_CMDS

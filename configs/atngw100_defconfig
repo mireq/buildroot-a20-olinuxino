@@ -1,3 +1,6 @@
+# AVR32 is deprecated
+BR2_DEPRECATED=y
+
 # Architecture
 BR2_avr32=y
 
@@ -5,6 +8,7 @@ BR2_avr32=y
 # below.
 BR2_KERNEL_HEADERS_VERSION=y
 BR2_DEFAULT_KERNEL_VERSION="3.9.11"
+BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_3_9=y
 
 # Filesystems
 BR2_TARGET_ROOTFS_JFFS2=y

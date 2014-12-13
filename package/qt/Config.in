@@ -1,10 +1,12 @@
 comment "qt needs a toolchain w/ C++, threads"
 	depends on !BR2_avr32
+	depends on BR2_USE_MMU
 	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_TOOLCHAIN_HAS_THREADS
 
 menuconfig BR2_PACKAGE_QT
 	bool "Qt"
 	depends on !BR2_avr32 # lacks TLS
+	depends on BR2_USE_MMU # fork
 	depends on BR2_INSTALL_LIBSTDCPP
 	depends on BR2_TOOLCHAIN_HAS_THREADS
 	help
@@ -21,7 +23,20 @@ config BR2_PACKAGE_QT_DEBUG
 	  If unsure, say N.
 
 config BR2_PACKAGE_QT_DEMOS
-	bool "Compile and install demos and examples (with code)"
+	bool "Compile and install Qt demos (with code)"
+	select BR2_PACKAGE_QT_GUI_MODULE
+	help
+	  If unsure, say N.
+
+config BR2_PACKAGE_QT_TRANSLATION_FILES
+	bool "Install translation files"
+	help
+	  Install binary .qm translation files.
+	  Say y if you need these files. They will take about 8 MB
+	  on the target root filesystem.
+
+config BR2_PACKAGE_QT_EXAMPLES
+	bool "Compile and install Qt examples (with code)"
 	select BR2_PACKAGE_QT_GUI_MODULE
 	help
 	  If unsure, say N.
@@ -33,7 +48,7 @@ choice
 
 config BR2_PACKAGE_QT_SHARED
 	bool "Shared library"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	help
 	  Create and use shared Qt libraries.
 	  If you have multiple programs that depend on Qt or intend to use
@@ -286,8 +301,8 @@ config BR2_PACKAGE_QT_PHONON_BACKEND
 
 config BR2_PACKAGE_QT_OPENGL_ES
 	bool "OpenGL ES v2.x support"
-	depends on BR2_PACKAGE_HAS_OPENGL_ES
-	depends on BR2_PACKAGE_HAS_OPENGL_EGL
+	depends on BR2_PACKAGE_HAS_LIBGLES
+	depends on BR2_PACKAGE_HAS_LIBEGL
 	help
 	  Enable the OpenGL ES v2.x support.
 
@@ -350,8 +365,9 @@ config BR2_PACKAGE_QT_ARCH_SUPPORTS_WEBKIT
 	bool
 	# see src/3rdparty/webkit/Source/JavaScriptCore/wtf/Platform.h
 	default y if BR2_arm || BR2_armeb || BR2_i386 || BR2_mips || \
-		BR2_mipsel || BR2_powerpc || BR2_sh4 || BR2_sh4eb || \
-		BR2_sh4a || BR2_sh4aeb || BR2_sparc || BR2_x86_64
+		BR2_mipsel || BR2_mips64 || BR2_mips64el || BR2_powerpc || \
+		BR2_sh4 || BR2_sh4eb || BR2_sh4a || BR2_sh4aeb || \
+		BR2_sparc || BR2_x86_64
 
 config BR2_PACKAGE_QT_WEBKIT
 	bool "WebKit Module"
@@ -359,12 +375,14 @@ config BR2_PACKAGE_QT_WEBKIT
 	depends on BR2_PACKAGE_QT_GUI_MODULE
 	depends on BR2_PACKAGE_QT_NETWORK
 	depends on BR2_PACKAGE_QT_ARCH_SUPPORTS_WEBKIT
+	depends on BR2_TOOLCHAIN_HAS_THREADS_NPTL # needs pthread_getattr_np()
 	help
 	  Build the WebKit module.
 	  If unsure, say n.
 
-comment "WebKit needs shared library/gui/network support"
+comment "WebKit needs shared library/NPTL toolchain/gui/network support"
 	depends on !(BR2_PACKAGE_QT_SHARED && BR2_PACKAGE_QT_GUI_MODULE && BR2_PACKAGE_QT_NETWORK)
+	depends on !BR2_TOOLCHAIN_HAS_THREADS_NPTL
 	depends on BR2_PACKAGE_QT_ARCH_SUPPORTS_WEBKIT
 
 config BR2_PACKAGE_QT_STL
@@ -386,10 +404,15 @@ config BR2_PACKAGE_QT_OPENSSL
 config BR2_PACKAGE_QT_SCRIPT
 	bool "Script Module"
 	depends on BR2_PACKAGE_QT_ARCH_SUPPORTS_WEBKIT
+	depends on BR2_TOOLCHAIN_HAS_THREADS_NPTL # needs pthread_getattr_np()
 	default y
 	help
 	  Build the Qt Script module.
 	  if unsure, say y.
+
+comment "Script Module needs a toolchain with NPTL"
+	depends on !BR2_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on BR2_PACKAGE_QT_ARCH_SUPPORTS_WEBKIT
 
 config BR2_PACKAGE_QT_SCRIPTTOOLS
 	bool "Script Tools Module"
@@ -406,5 +429,10 @@ config BR2_PACKAGE_QT_DECLARATIVE
 	help
 	  Build the Qt Declarative Module for qml support
 	  if unsure, say n.
+
+config BR2_PACKAGE_QT_TEST
+	bool "Test Module"
+	help
+	  Install the Test module.
 
 endif # BR2_PACKAGE_QT

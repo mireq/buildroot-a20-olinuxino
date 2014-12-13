@@ -4,11 +4,13 @@
 #
 ################################################################################
 
-GTK2_ENGINES_VERSION = 2.20.2
-GTK2_ENGINES_SOURCE  = gtk-engines-$(GTK2_ENGINES_VERSION).tar.bz2
-GTK2_ENGINES_SITE    = http://ftp.gnome.org/pub/GNOME/sources/gtk-engines/2.20
-
+GTK2_ENGINES_VERSION_MAJOR = 2.20
+GTK2_ENGINES_VERSION = $(GTK2_ENGINES_VERSION_MAJOR).2
+GTK2_ENGINES_SOURCE = gtk-engines-$(GTK2_ENGINES_VERSION).tar.bz2
+GTK2_ENGINES_SITE = http://ftp.gnome.org/pub/GNOME/sources/gtk-engines/$(GTK2_ENGINES_VERSION_MAJOR)
 GTK2_ENGINES_DEPENDENCIES = libgtk2 host-intltool
+GTK2_ENGINES_LICENSE = LGPLv2.1+
+GTK2_ENGINES_LICENSE_FILES = COPYING
 
 GTK2_ENGINES_CONF_ENV = \
 		ac_cv_func_posix_getpwuid_r=yes \
@@ -63,13 +65,12 @@ GTK2_ENGINES_CONF_ENV = \
 		gl_cv_c_restrict=no \
 		ac_cv_path_CUPS_CONFIG=no
 
-GTK2_ENGINES_CONF_OPT = \
+GTK2_ENGINES_CONF_OPTS = \
 		--with-x \
 		--x-includes=$(STAGING_DIR)/usr/include/X11 \
 		--x-libraries=$(STAGING_DIR)/usr/lib \
 		--disable-glibtest \
 		--enable-explicit-deps=no \
-		--disable-debug \
 		--enable-clearlooks \
 		--disable-crux \
 		--disable-hc \

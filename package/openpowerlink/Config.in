@@ -1,4 +1,5 @@
 comment "openpowerlink needs a toolchain w/ C++, threads"
+	depends on BR2_USE_MMU
 	depends on BR2_i386 || BR2_x86_64
 	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_TOOLCHAIN_HAS_THREADS
 
@@ -7,6 +8,7 @@ config BR2_PACKAGE_OPENPOWERLINK
 	depends on BR2_INSTALL_LIBSTDCPP
 	depends on BR2_TOOLCHAIN_HAS_THREADS
 	depends on BR2_i386 || BR2_x86_64
+	depends on BR2_USE_MMU # qt
 	help
 	  openPOWERLINK is an Open Source Industrial Ethernet
 	  stack implementing the POWERLINK protocol for Managing Node
@@ -57,6 +59,9 @@ config BR2_PACKAGE_OPENPOWERLINK_82573
 
 config BR2_PACKAGE_OPENPOWERLINK_8255x
 	bool "Intel 8255x"
+
+config BR2_PACKAGE_OPENPOWERLINK_I210
+	bool "Intel I210"
 
 config BR2_PACKAGE_OPENPOWERLINK_RTL8139
 	bool "Realtek RTL-8139"

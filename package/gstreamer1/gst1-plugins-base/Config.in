@@ -1,6 +1,5 @@
 menuconfig BR2_PACKAGE_GST1_PLUGINS_BASE
 	bool "gst1-plugins-base"
-	depends on BR2_PACKAGE_GSTREAMER1
 	select BR2_PACKAGE_XLIB_LIBX11 if BR2_PACKAGE_XORG7
 	select BR2_PACKAGE_XLIB_LIBXEXT if BR2_PACKAGE_XORG7
 	select BR2_PACKAGE_XLIB_LIBXV if BR2_PACKAGE_XORG7
@@ -132,6 +131,7 @@ config BR2_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_PANGO
 	depends on BR2_INSTALL_LIBSTDCPP
 	depends on BR2_USE_WCHAR # pango -> libglib2
 	depends on BR2_TOOLCHAIN_HAS_THREADS # pango -> libglib2
+	depends on BR2_USE_MMU # pango -> libglib2
 	select BR2_PACKAGE_PANGO
 	help
 	  Pango-based text rendering and overlay

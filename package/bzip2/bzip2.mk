@@ -10,7 +10,7 @@ BZIP2_INSTALL_STAGING = YES
 BZIP2_LICENSE = bzip2 license
 BZIP2_LICENSE_FILES = LICENSE
 
-ifeq ($(BR2_PREFER_STATIC_LIB),)
+ifeq ($(BR2_STATIC_LIBS),)
 define BZIP2_BUILD_SHARED_CMDS
 	$(TARGET_MAKE_ENV)
 		$(MAKE) -C $(@D) -f Makefile-libbz2_so $(TARGET_CONFIGURE_OPTS)
@@ -23,7 +23,7 @@ define BZIP2_BUILD_CMDS
 	$(BZIP2_BUILD_SHARED_CMDS)
 endef
 
-ifeq ($(BR2_PREFER_STATIC_LIB),)
+ifeq ($(BR2_STATIC_LIBS),)
 define BZIP2_INSTALL_STAGING_SHARED_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE) \
 		-f Makefile-libbz2_so PREFIX=$(STAGING_DIR)/usr -C $(@D) install
@@ -36,7 +36,7 @@ define BZIP2_INSTALL_STAGING_CMDS
 	$(BZIP2_INSTALL_STAGING_SHARED_CMDS)
 endef
 
-ifeq ($(BR2_PREFER_STATIC_LIB),)
+ifeq ($(BR2_STATIC_LIBS),)
 define BZIP2_INSTALL_TARGET_SHARED_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE) \
 		-f Makefile-libbz2_so PREFIX=$(TARGET_DIR)/usr -C $(@D) install
@@ -61,6 +61,8 @@ endef
 define HOST_BZIP2_INSTALL_CMDS
 	$(HOST_MAKE_ENV) \
 		$(MAKE) PREFIX=$(HOST_DIR)/usr -C $(@D) install
+	$(HOST_MAKE_ENV) \
+		$(MAKE) -f Makefile-libbz2_so PREFIX=$(HOST_DIR)/usr -C $(@D) install
 endef
 
 $(eval $(generic-package))

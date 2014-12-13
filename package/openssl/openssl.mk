@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-OPENSSL_VERSION = 1.0.1e
+OPENSSL_VERSION = 1.0.1j
 OPENSSL_SITE = http://www.openssl.org/source
 OPENSSL_LICENSE = OpenSSL or SSLeay
 OPENSSL_LICENSE_FILES = LICENSE
@@ -42,6 +42,12 @@ ifeq ($(BR2_powerpc_401)$(BR2_powerpc_403)$(BR2_powerpc_405)$(BR2_powerpc_405fp)
 	OPENSSL_TARGET_ARCH = ppc
 endif
 endif
+ifeq ($(ARCH),powerpc64)
+	OPENSSL_TARGET_ARCH = ppc64
+endif
+ifeq ($(ARCH),powerpc64le)
+	OPENSSL_TARGET_ARCH = ppc64le
+endif
 ifeq ($(ARCH),x86_64)
 	OPENSSL_TARGET_ARCH = x86_64
 endif
@@ -55,12 +61,13 @@ define HOST_OPENSSL_CONFIGURE_CMDS
 	(cd $(@D); \
 		$(HOST_CONFIGURE_OPTS) \
 		./config \
-		--prefix=/usr \
-		--openssldir=/etc/ssl \
+		--prefix=$(HOST_DIR)/usr \
+		--openssldir=$(HOST_DIR)/etc/ssl \
 		--libdir=/lib \
 		shared \
-		no-zlib \
+		zlib-dynamic \
 	)
+	$(SED) "s:-O[0-9]:$(HOST_CFLAGS):" $(@D)/Makefile
 endef
 
 define OPENSSL_CONFIGURE_CMDS
@@ -73,14 +80,14 @@ define OPENSSL_CONFIGURE_CMDS
 			--openssldir=/etc/ssl \
 			--libdir=/lib \
 			$(if $(BR2_TOOLCHAIN_HAS_THREADS),threads,no-threads) \
-			$(if $(BR2_PREFER_STATIC_LIB),no-shared,shared) \
+			$(if $(BR2_STATIC_LIBS),no-shared,shared) \
 			no-idea \
 			no-rc5 \
 			enable-camellia \
 			enable-mdc2 \
 			enable-tlsext \
-			$(if $(BR2_PREFER_STATIC_LIB),zlib,zlib-dynamic) \
-			$(if $(BR2_PREFER_STATIC_LIB),no-dso) \
+			$(if $(BR2_STATIC_LIBS),zlib,zlib-dynamic) \
+			$(if $(BR2_STATIC_LIBS),no-dso) \
 	)
 	$(SED) "s:-march=[-a-z0-9] ::" -e "s:-mcpu=[-a-z0-9] ::g" $(@D)/Makefile
 	$(SED) "s:-O[0-9]:$(OPENSSL_CFLAGS):" $(@D)/Makefile
@@ -100,7 +107,7 @@ define OPENSSL_INSTALL_STAGING_CMDS
 endef
 
 define HOST_OPENSSL_INSTALL_CMDS
-	$(MAKE1) -C $(@D) INSTALL_PREFIX=$(HOST_DIR) install
+	$(MAKE1) -C $(@D) install
 endef
 
 define OPENSSL_INSTALL_TARGET_CMDS
@@ -109,7 +116,17 @@ define OPENSSL_INSTALL_TARGET_CMDS
 	rm -f $(TARGET_DIR)/usr/bin/c_rehash
 endef
 
-ifneq ($(BR2_PREFER_STATIC_LIB),y)
+# libdl has no business in a static build
+ifeq ($(BR2_STATIC_LIBS),y)
+define OPENSSL_FIXUP_STATIC_PKGCONFIG
+	$(SED) 's/-ldl//' $(STAGING_DIR)/usr/lib/pkgconfig/libcrypto.pc
+	$(SED) 's/-ldl//' $(STAGING_DIR)/usr/lib/pkgconfig/libssl.pc
+	$(SED) 's/-ldl//' $(STAGING_DIR)/usr/lib/pkgconfig/openssl.pc
+endef
+OPENSSL_POST_INSTALL_STAGING_HOOKS += OPENSSL_FIXUP_STATIC_PKGCONFIG
+endif
+
+ifneq ($(BR2_STATIC_LIBS),y)
 # libraries gets installed read only, so strip fails
 define OPENSSL_INSTALL_FIXUPS_SHARED
 	chmod +w $(TARGET_DIR)/usr/lib/engines/lib*.so

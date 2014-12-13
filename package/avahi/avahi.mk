@@ -12,7 +12,7 @@
 # later version.
 
 AVAHI_VERSION = 0.6.31
-AVAHI_SITE = http://www.avahi.org/download/
+AVAHI_SITE = http://www.avahi.org/download
 AVAHI_LICENSE = LGPLv2.1+
 AVAHI_LICENSE_FILES = LICENSE
 AVAHI_INSTALL_STAGING = YES
@@ -67,56 +67,65 @@ AVAHI_CONF_ENV = ac_cv_func_strtod=yes \
 		avahi_cv_sys_cxx_works=yes \
 		DATADIRNAME=share
 
-AVAHI_CONF_OPT = --localstatedir=/var \
+AVAHI_CONF_OPTS = \
 		--disable-qt3 \
 		--disable-qt4 \
 		--disable-gdbm \
-		--disable-python-dbus \
 		--disable-pygtk \
-		--disable-gtk3 \
 		--disable-mono \
 		--disable-monodoc \
 		--disable-stack-protector \
 		--with-distro=none \
-		$(if $(BR2_HAVE_DOCUMENTATION),--enable,--disable)-manpages \
+		--disable-manpages \
 		$(if $(BR2_PACKAGE_AVAHI_AUTOIPD),--enable,--disable)-autoipd \
-		--with-avahi-user=default \
-		--with-avahi-group=default \
-		--with-autoipd-user=default \
-		--with-autoipd-group=default
+		--with-avahi-user=avahi \
+		--with-avahi-group=avahi \
+		--with-autoipd-user=avahi \
+		--with-autoipd-group=avahi
 
 AVAHI_DEPENDENCIES = $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext) host-intltool \
-       host-pkgconf host-gettext
+	host-pkgconf host-gettext
 
 ifneq ($(BR2_PACKAGE_AVAHI_DAEMON)$(BR2_PACKAGE_AVAHI_AUTOIPD),)
 AVAHI_DEPENDENCIES += libdaemon
 else
-AVAHI_CONF_OPT += --disable-libdaemon
+AVAHI_CONF_OPTS += --disable-libdaemon
 endif
 
 ifeq ($(BR2_PACKAGE_AVAHI_DAEMON),y)
 AVAHI_DEPENDENCIES += expat
-AVAHI_CONF_OPT += --with-xml=expat
+AVAHI_CONF_OPTS += --with-xml=expat
 else
-AVAHI_CONF_OPT += --with-xml=none
+AVAHI_CONF_OPTS += --with-xml=none
+endif
+
+ifeq ($(BR2_PACKAGE_AVAHI_LIBDNSSD_COMPATIBILITY),y)
+AVAHI_CONF_OPTS += --enable-compat-libdns_sd
 endif
 
 ifeq ($(BR2_PACKAGE_DBUS),y)
 AVAHI_DEPENDENCIES += dbus
 else
-AVAHI_CONF_OPT += --disable-dbus
+AVAHI_CONF_OPTS += --disable-dbus
 endif
 
 ifeq ($(BR2_PACKAGE_LIBGLIB2),y)
 AVAHI_DEPENDENCIES += libglib2
 else
-AVAHI_CONF_OPT += --disable-glib --disable-gobject
+AVAHI_CONF_OPTS += --disable-glib --disable-gobject
 endif
 
 ifeq ($(BR2_PACKAGE_LIBGLADE),y)
 AVAHI_DEPENDENCIES += libglade
 else
-AVAHI_CONF_OPT += --disable-gtk
+AVAHI_CONF_OPTS += --disable-gtk
+endif
+
+ifeq ($(BR2_PACKAGE_LIBGTK3),y)
+AVAHI_DEPENDENCIES += libgtk3
+AVAHI_CONF_OPTS += --enable-gtk3
+else
+AVAHI_CONF_OPTS += --disable-gtk3
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON),y)
@@ -129,12 +138,24 @@ AVAHI_CONF_ENV += am_cv_pathless_PYTHON=python \
 		py_cv_mod_socket_=yes
 
 AVAHI_DEPENDENCIES += python
-AVAHI_CONF_OPT += --enable-python
+AVAHI_CONF_OPTS += --enable-python
 else
-AVAHI_CONF_OPT += --disable-python
+AVAHI_CONF_OPTS += --disable-python
 endif
 
-AVAHI_MAKE_OPT += $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),LIBS=-lintl)
+ifeq ($(BR2_PACKAGE_DBUS_PYTHON),y)
+AVAHI_CONF_OPTS += --enable-python-dbus
+AVAHI_CONF_ENV  += py_cv_mod_dbus_=yes
+AVAHI_DEPENDENCIES += dbus-python
+else
+AVAHI_CONF_OPTS += --disable-python-dbus
+endif
+
+AVAHI_MAKE_OPTS += $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),LIBS=-lintl)
+
+define AVAHI_USERS
+	avahi -1 avahi -1 * - - -
+endef
 
 define AVAHI_REMOVE_INITSCRIPT
 	rm -rf $(TARGET_DIR)/etc/init.d/avahi-*
@@ -142,23 +163,54 @@ endef
 
 AVAHI_POST_INSTALL_TARGET_HOOKS += AVAHI_REMOVE_INITSCRIPT
 
+ifeq ($(BR2_PACKAGE_AVAHI_AUTOIPD),y)
 define AVAHI_INSTALL_AUTOIPD
-	$(INSTALL) -m 0755 package/avahi/S05avahi-setup.sh $(TARGET_DIR)/etc/init.d/
 	rm -f $(TARGET_DIR)/var/lib/avahi-autoipd
 	$(INSTALL) -d -m 0755 $(TARGET_DIR)/var/lib
 	ln -sf /tmp/avahi-autoipd $(TARGET_DIR)/var/lib/avahi-autoipd
 endef
 
-ifeq ($(BR2_PACKAGE_AVAHI_AUTOIPD),y)
+define AVAHI_INSTALL_AUTOIPD_INIT_SYSV
+	$(INSTALL) -D -m 0755 package/avahi/S05avahi-setup.sh $(TARGET_DIR)/etc/init.d/S05avahi-setup.sh
+endef
+
 AVAHI_POST_INSTALL_TARGET_HOOKS += AVAHI_INSTALL_AUTOIPD
 endif
 
-define AVAHI_INSTALL_DAEMON_INITSCRIPT
-	$(INSTALL) -m 0755 package/avahi/S50avahi-daemon $(TARGET_DIR)/etc/init.d/
+ifeq ($(BR2_PACKAGE_AVAHI_DAEMON),y)
+
+define AVAHI_INSTALL_INIT_SYSTEMD
+	mkdir -p $(TARGET_DIR)/etc/systemd/system/multi-user.target.wants
+
+	ln -fs /lib/systemd/system/avahi-daemon.service \
+		$(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/avahi-daemon.service
+
+	ln -fs /lib/systemd/system/avahi-dnsconfd.service \
+		$(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/avahi-dnsconfd.service
+
+	$(INSTALL) -D -m 644 package/avahi/avahi_tmpfiles.conf \
+		$(TARGET_DIR)/usr/lib/tmpfiles.d/avahi.conf
 endef
 
-ifeq ($(BR2_PACKAGE_AVAHI_DAEMON),y)
-AVAHI_POST_INSTALL_TARGET_HOOKS += AVAHI_INSTALL_DAEMON_INITSCRIPT
+define AVAHI_INSTALL_DAEMON_INIT_SYSV
+	$(INSTALL) -D -m 0755 package/avahi/S50avahi-daemon $(TARGET_DIR)/etc/init.d/S50avahi-daemon
+endef
+
+endif
+
+define AVAHI_INSTALL_INIT_SYSV
+	$(AVAHI_INSTALL_AUTOIPD_INIT_SYSV)
+	$(AVAHI_INSTALL_DAEMON_INIT_SYSV)
+endef
+
+# applications expects to be able to #include <dns_sd.h>
+define AVAHI_STAGING_INSTALL_LIBDNSSD_LINK
+	ln -sf avahi-compat-libdns_sd/dns_sd.h \
+		$(STAGING_DIR)/usr/include/dns_sd.h
+endef
+
+ifeq ($(BR2_PACKAGE_AVAHI_LIBDNSSD_COMPATIBILITY),y)
+AVAHI_POST_INSTALL_STAGING_HOOKS += AVAHI_STAGING_INSTALL_LIBDNSSD_LINK
 endif
 
 $(eval $(autotools-package))

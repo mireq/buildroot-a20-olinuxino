@@ -4,8 +4,10 @@
 #
 ################################################################################
 
-MONGREL2_VERSION = v1.8.0
-MONGREL2_SITE = $(call github,zedshaw,mongrel2,$(MONGREL2_VERSION))
+MONGREL2_VERSION = v1.9.1
+# Do not use the github helper here, the generated tarball is *NOT* the same
+# as the one uploaded by upstream for the release.
+MONGREL2_SITE = https://github.com/zedshaw/mongrel2/releases/download/$(MONGREL2_VERSION)
 MONGREL2_LICENSE = BSD-3c
 MONGREL2_LICENSE_FILES = LICENSE
 MONGREL2_DEPENDENCIES = sqlite zeromq

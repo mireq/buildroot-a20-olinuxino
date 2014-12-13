@@ -1,16 +1,22 @@
-comment "gst-fsl-plugins requires an imx-specific kernel to be built"
-	depends on BR2_arm && BR2_PACKAGE_GSTREAMER && !BR2_LINUX_KERNEL
+comment "gst-fsl-plugins needs an imx-specific Linux kernel to be built"
+	depends on BR2_arm && !BR2_LINUX_KERNEL
+
+comment "gst-fsl-plugins needs an (e)glibc toolchain"
+	depends on BR2_arm
+	depends on !BR2_TOOLCHAIN_USES_GLIBC
 
 config BR2_PACKAGE_GST_FSL_PLUGINS
 	bool "gst-fsl-plugins"
 	depends on BR2_LINUX_KERNEL
 	depends on BR2_arm # Only relevant for i.MX
-	depends on BR2_PACKAGE_GSTREAMER
+	depends on BR2_TOOLCHAIN_USES_GLIBC # libfslcodec
 	select BR2_PACKAGE_GST_PLUGINS_BASE
 	select BR2_PACKAGE_LIBFSLVPUWRAP
 	select BR2_PACKAGE_IMX_LIB
+	select BR2_PACKAGE_IMX_VPU
 	select BR2_PACKAGE_LIBFSLPARSER
 	select BR2_PACKAGE_LIBFSLCODEC
+	select BR2_PACKAGE_FREESCALE_IMX
 	help
 	  GStreamer plugins for hardware-accelerated audio and video
 	  parsers and codecs on i.MX platforms. It requires a kernel that
@@ -28,6 +34,13 @@ config BR2_PACKAGE_GST_FSL_PLUGINS
 if BR2_PACKAGE_GST_FSL_PLUGINS
 choice
 	prompt "i.MX platform"
+	default BR2_PACKAGE_GST_FSL_PLUGINS_PLATFORM_MX25 if BR2_PACKAGE_FREESCALE_IMX_PLATFORM_IMX25_3STACK
+	default BR2_PACKAGE_GST_FSL_PLUGINS_PLATFORM_MX27 if BR2_PACKAGE_FREESCALE_IMX_PLATFORM_IMX27ADS
+	default BR2_PACKAGE_GST_FSL_PLUGINS_PLATFORM_MX37 if BR2_PACKAGE_FREESCALE_IMX_PLATFORM_IMX37_3STACK
+	default BR2_PACKAGE_GST_FSL_PLUGINS_PLATFORM_MX50 if BR2_PACKAGE_FREESCALE_IMX_PLATFORM_IMX50
+	default BR2_PACKAGE_GST_FSL_PLUGINS_PLATFORM_MX51 if BR2_PACKAGE_FREESCALE_IMX_PLATFORM_IMX51
+	default BR2_PACKAGE_GST_FSL_PLUGINS_PLATFORM_MX53 if BR2_PACKAGE_FREESCALE_IMX_PLATFORM_IMX53
+	default BR2_PACKAGE_GST_FSL_PLUGINS_PLATFORM_MX6  if BR2_PACKAGE_FREESCALE_IMX_PLATFORM_IMX6Q
 
 config BR2_PACKAGE_GST_FSL_PLUGINS_PLATFORM_MX233
 	bool "imx233"

@@ -7,7 +7,7 @@
 
 ROOTFS_INITRAMFS_DEPENDENCIES += rootfs-cpio
 
-ROOTFS_INITRAMFS_POST_TARGETS += linux26-rebuild-with-initramfs
+ROOTFS_INITRAMFS_POST_TARGETS += linux-rebuild-with-initramfs
 
 
 # The generic fs infrastructure isn't very useful here.
@@ -18,5 +18,5 @@ rootfs-initramfs-show-depends:
 	@echo $(ROOTFS_INITRAMFS_DEPENDENCIES)
 
 ifeq ($(BR2_TARGET_ROOTFS_INITRAMFS),y)
-TARGETS += rootfs-initramfs
+TARGETS_ROOTFS += rootfs-initramfs
 endif

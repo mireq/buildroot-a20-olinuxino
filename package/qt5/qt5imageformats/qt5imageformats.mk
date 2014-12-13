@@ -19,7 +19,7 @@ QT5IMAGEFORMATS_REDISTRIBUTE = NO
 endif
 
 define QT5IMAGEFORMATS_CONFIGURE_CMDS
-	(cd $(@D); $(HOST_DIR)/usr/bin/qmake)
+	(cd $(@D); $(TARGET_MAKE_ENV) $(HOST_DIR)/usr/bin/qmake)
 endef
 
 define QT5IMAGEFORMATS_BUILD_CMDS
@@ -30,7 +30,7 @@ define QT5IMAGEFORMATS_INSTALL_STAGING_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) install
 endef
 
-ifeq ($(BR2_PREFER_STATIC_LIB),)
+ifeq ($(BR2_STATIC_LIBS),)
 define QT5IMAGEFORMATS_INSTALL_TARGET_CMDS
 	cp -dpf $(STAGING_DIR)/usr/lib/qt/plugins/imageformats/*.so $(TARGET_DIR)/usr/lib/qt/plugins/imageformats/
 endef

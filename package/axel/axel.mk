@@ -5,7 +5,7 @@
 ################################################################################
 
 AXEL_VERSION = 2.4
-AXEL_SITE = https://alioth.debian.org/frs/download.php/file/3015
+AXEL_SITE = http://sources.buildroot.net
 AXEL_LICENSE = GPLv2+
 AXEL_LICENSE_FILES = COPYING
 
@@ -17,7 +17,7 @@ AXEL_LDFLAGS += -lintl
 endif
 
 ifneq ($(BR2_ENABLE_LOCALE),y)
-AXEL_DISABLE_I18N=--i18n=0
+AXEL_DISABLE_I18N = --i18n=0
 endif
 
 define AXEL_CONFIGURE_CMDS
