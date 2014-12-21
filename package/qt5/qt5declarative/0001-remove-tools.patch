@@ -1,15 +1,6 @@
-diff -urN qtdeclarative-opensource-src-5.2.1.old/src/qmldevtools/qmldevtools.pro qtdeclarative-opensource-src-5.2.1/src/qmldevtools/qmldevtools.pro
---- qtdeclarative-opensource-src-5.2.1.old/src/qmldevtools/qmldevtools.pro	2014-02-01 21:38:02.000000000 +0100
-+++ qtdeclarative-opensource-src-5.2.1/src/qmldevtools/qmldevtools.pro	2014-02-08 16:27:35.530461798 +0100
-@@ -1,4 +1,3 @@
--option(host_build)
- TARGET     = QtQmlDevTools
- QT         = core
- CONFIG += static no_module_headers internal_module
-diff -urN qtdeclarative-opensource-src-5.2.1.old/tools/tools.pro qtdeclarative-opensource-src-5.2.1/tools/tools.pro
---- qtdeclarative-opensource-src-5.2.1.old/tools/tools.pro	2014-02-01 21:38:02.000000000 +0100
-+++ qtdeclarative-opensource-src-5.2.1/tools/tools.pro	2014-02-08 16:15:13.200420412 +0100
-@@ -1,19 +1,11 @@
+--- old/tools/tools.pro	2014-12-05 17:25:10.000000000 +0100
++++ new/tools/tools.pro	2014-12-21 12:28:26.813610634 +0100
+@@ -1,20 +1,11 @@
  TEMPLATE = subdirs
 -SUBDIRS += \
 -    qmlmin \
@@ -22,7 +13,8 @@ diff -urN qtdeclarative-opensource-src-5.2.1.old/tools/tools.pro qtdeclarative-o
 -    SUBDIRS += \
 -        qml \
 -        qmlprofiler \
--        qmlbundle
+-        qmlbundle \
+-        qmllint
      qtHaveModule(quick) {
 -        !static: SUBDIRS += qmlscene qmlplugindump
 -        qtHaveModule(widgets): SUBDIRS += qmleasing

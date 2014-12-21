@@ -1,0 +1,32 @@
+--- old/src/platformsupport/eglconvenience/qeglplatformintegration.cpp	2014-12-21 12:08:06.110223752 +0100
++++ new/src/platformsupport/eglconvenience/qeglplatformintegration.cpp	2014-12-21 12:08:12.396856361 +0100
+@@ -106,10 +106,29 @@
+     if (m_display == EGL_NO_DISPLAY)
+         qFatal("Could not open egl display");
+ 
++    QByteArray fbDev = qgetenv("QT_QPA_EGLFS_FB");
++    if (fbDev.isEmpty())
++        fbDev = QByteArrayLiteral("/dev/fb0");
++    QFile framebuffer(QString::fromLocal8Bit(fbDev));
++    framebuffer.open(QIODevice::ReadOnly);
++    QByteArray fbData;
++    if (framebuffer.isOpen()) {
++        fbData = framebuffer.readAll();
++        framebuffer.close();
++    }
++
+     EGLint major, minor;
+     if (!eglInitialize(m_display, &major, &minor))
+         qFatal("Could not initialize egl display");
+ 
++    if (!fbData.isEmpty()) {
++        framebuffer.open(QIODevice::WriteOnly);
++        if (framebuffer.isOpen()) {
++            framebuffer.write(fbData);
++            framebuffer.close();
++        }
++    }
++
+     m_screen = createScreen();
+     screenAdded(m_screen);
+ 
