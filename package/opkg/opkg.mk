@@ -29,10 +29,10 @@ OPKG_CONF_OPTS += --disable-gpg
 endif
 
 ifeq ($(BR2_PACKAGE_OPKG_CURL),y)
-OPKG_CONF_OPT += --enable-curl --enable-ssl-curl
+OPKG_CONF_OPTS += --enable-curl --enable-ssl-curl
 OPKG_DEPENDENCIES += curl libcurl
 else
-OPKG_CONF_OPT += --disable-curl
+OPKG_CONF_OPTS += --disable-curl
 endif
 
 OPKG_POST_INSTALL_TARGET_HOOKS += OPKG_CREATE_LOCKDIR
