@@ -4,18 +4,12 @@
 #
 ################################################################################
 
-READ_EDID_VERSION = 1.4.2
+READ_EDID_VERSION = 3.0.2
 READ_EDID_SITE = http://www.polypux.org/projects/read-edid
-READ_EDID_LICENSE = GPLv2
-READ_EDID_LICENSE_FILES = COPYING
+READ_EDID_LICENSE = BSD-like
+READ_EDID_LICENSE_FILES = LICENSE
 
-define READ_EDID_BUILD_CMDS
-	$(MAKE) $(TARGET_CONFIGURE_OPTS) -C $(@D)
-endef
+# disable classic get-edid support (needs libx86)
+READ_EDID_CONF_OPTS += -DCLASSICBUILD=OFF
 
-define READ_EDID_INSTALL_TARGET_CMDS
-	$(INSTALL) -D -m 0755 $(@D)/get-edid $(TARGET_DIR)/sbin/get-edid
-	$(INSTALL) -D -m 0755 $(@D)/parse-edid $(TARGET_DIR)/sbin/parse-edid
-endef
-
-$(eval $(autotools-package))
+$(eval $(cmake-package))

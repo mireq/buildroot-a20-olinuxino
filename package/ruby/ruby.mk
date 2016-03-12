@@ -4,16 +4,17 @@
 #
 ################################################################################
 
-RUBY_VERSION_MAJOR = 2.1
-RUBY_VERSION = $(RUBY_VERSION_MAJOR).5
-RUBY_VERSION_EXT = 2.1.0
+RUBY_VERSION_MAJOR = 2.3
+RUBY_VERSION = $(RUBY_VERSION_MAJOR).0
+RUBY_VERSION_EXT = 2.3.0
 RUBY_SITE = http://cache.ruby-lang.org/pub/ruby/$(RUBY_VERSION_MAJOR)
+RUBY_SOURCE = ruby-$(RUBY_VERSION).tar.xz
 RUBY_DEPENDENCIES = host-pkgconf host-ruby
 HOST_RUBY_DEPENDENCIES = host-pkgconf
 RUBY_MAKE_ENV = $(TARGET_MAKE_ENV)
-RUBY_MAKE = $(MAKE1)
 RUBY_CONF_OPTS = --disable-install-doc --disable-rpath --disable-rubygems
-HOST_RUBY_CONF_OPTS = --disable-install-doc \
+HOST_RUBY_CONF_OPTS = \
+	--disable-install-doc \
 	--with-out-ext=curses,openssl,readline \
 	--without-gmp
 RUBY_LICENSE = Ruby or BSD-2c, BSD-3c, others
@@ -29,40 +30,51 @@ endif
 RUBY_CONF_ENV = CFLAGS="$(RUBY_CFLAGS)"
 
 ifeq ($(BR2_bfin),y)
-RUBY_CONF_ENV = ac_cv_func_dl_iterate_phdr=no
+RUBY_CONF_ENV += ac_cv_func_dl_iterate_phdr=no
 # Blackfin doesn't have FFI closure support, needed by the fiddle
 # extension.
 RUBY_CONF_OPTS += --with-out-ext=fiddle
 endif
 
+ifeq ($(BR2_TOOLCHAIN_HAS_SSP),)
+RUBY_CONF_ENV += stack_protector=no
+endif
+
 # Force optionals to build before we do
 ifeq ($(BR2_PACKAGE_BERKELEYDB),y)
-	RUBY_DEPENDENCIES += berkeleydb
+RUBY_DEPENDENCIES += berkeleydb
 endif
 ifeq ($(BR2_PACKAGE_GDBM),y)
-	RUBY_DEPENDENCIES += gdbm
+RUBY_DEPENDENCIES += gdbm
 endif
 ifeq ($(BR2_PACKAGE_LIBYAML),y)
-	RUBY_DEPENDENCIES += libyaml
+RUBY_DEPENDENCIES += libyaml
 endif
 ifeq ($(BR2_PACKAGE_NCURSES),y)
-	RUBY_DEPENDENCIES += ncurses
+RUBY_DEPENDENCIES += ncurses
 endif
 ifeq ($(BR2_PACKAGE_OPENSSL),y)
-	RUBY_DEPENDENCIES += openssl
+RUBY_DEPENDENCIES += openssl
 endif
 ifeq ($(BR2_PACKAGE_READLINE),y)
-	RUBY_DEPENDENCIES += readline
+RUBY_DEPENDENCIES += readline
 endif
 ifeq ($(BR2_PACKAGE_ZLIB),y)
-	RUBY_DEPENDENCIES += zlib
+RUBY_DEPENDENCIES += zlib
 endif
 ifeq ($(BR2_PACKAGE_GMP),y)
-	RUBY_DEPENDENCIES += gmp
-	RUBY_CONF_OPTS += --with-gmp
+RUBY_DEPENDENCIES += gmp
+RUBY_CONF_OPTS += --with-gmp
 else
-	RUBY_CONF_OPTS += --without-gmp
+RUBY_CONF_OPTS += --without-gmp
 endif
+
+# workaround for amazing build failure, see
+# http://lists.busybox.net/pipermail/buildroot/2014-December/114273.html
+define RUBY_REMOVE_VERCONF_H
+	rm -f $(@D)/verconf.h
+endef
+RUBY_POST_CONFIGURE_HOOKS += RUBY_REMOVE_VERCONF_H
 
 # Remove rubygems and friends, as they need extensions that aren't
 # built and a target compiler.

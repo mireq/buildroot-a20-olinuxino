@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-USB_MODESWITCH_VERSION = 2.2.0
+USB_MODESWITCH_VERSION = 2.3.0
 USB_MODESWITCH_SOURCE = usb-modeswitch-$(USB_MODESWITCH_VERSION).tar.bz2
 USB_MODESWITCH_SITE = http://www.draisberghof.de/usb_modeswitch
 USB_MODESWITCH_DEPENDENCIES = libusb
@@ -15,9 +15,9 @@ USB_MODESWITCH_BUILD_TARGETS = static
 USB_MODESWITCH_INSTALL_TARGETS = install-static
 
 ifeq ($(BR2_PACKAGE_TCL)$(BR2_PACKAGE_TCL_SHLIB_ONLY),y)
-	USB_MODESWITCH_DEPENDENCIES += tcl
-	USB_MODESWITCH_BUILD_TARGETS = script
-	USB_MODESWITCH_INSTALL_TARGETS = install-script
+USB_MODESWITCH_DEPENDENCIES += tcl
+USB_MODESWITCH_BUILD_TARGETS = script
+USB_MODESWITCH_INSTALL_TARGETS = install-script
 endif
 
 define USB_MODESWITCH_BUILD_CMDS

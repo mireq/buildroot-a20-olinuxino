@@ -4,10 +4,14 @@
 #
 ################################################################################
 
+ifeq ($(BR2_PACKAGE_LUA_5_3),y)
+LUA_VERSION = 5.3.2
+else
 ifeq ($(BR2_PACKAGE_LUA_5_2),y)
-LUA_VERSION = 5.2.3
+LUA_VERSION = 5.2.4
 else
 LUA_VERSION = 5.1.5
+endif
 endif
 LUA_SITE = http://www.lua.org/ftp
 LUA_INSTALL_STAGING = YES
@@ -24,29 +28,38 @@ LUA_CFLAGS = -Wall -fPIC -DLUA_USE_POSIX
 
 ifeq ($(BR2_PACKAGE_LUA_5_2),y)
 LUA_CFLAGS += -DLUA_COMPAT_ALL
-ifneq ($(BR2_LARGEFILE),y)
-LUA_CFLAGS += -D_FILE_OFFSET_BITS=32
 endif
+
+ifeq ($(BR2_PACKAGE_LUA_5_3),y)
+LUA_CFLAGS += -DLUA_COMPAT_5_2
 endif
 
 ifeq ($(BR2_STATIC_LIBS),y)
-	LUA_BUILDMODE = static
+LUA_BUILDMODE = static
 else
-	LUA_BUILDMODE = dynamic
-	LUA_CFLAGS += -DLUA_USE_DLOPEN
-	LUA_MYLIBS += -ldl
+LUA_BUILDMODE = dynamic
+LUA_CFLAGS += -DLUA_USE_DLOPEN
+LUA_MYLIBS += -ldl
 endif
 
 ifeq ($(BR2_PACKAGE_LUA_READLINE),y)
-	LUA_DEPENDENCIES = readline ncurses
-	LUA_MYLIBS += -lreadline -lhistory -lncurses
-	LUA_CFLAGS += -DLUA_USE_READLINE
+LUA_DEPENDENCIES = readline ncurses
+LUA_MYLIBS += -lreadline -lhistory -lncurses
+LUA_CFLAGS += -DLUA_USE_READLINE
 else
 ifeq ($(BR2_PACKAGE_LUA_LINENOISE),y)
-	LUA_DEPENDENCIES = linenoise
-	LUA_MYLIBS += -llinenoise
-	LUA_CFLAGS += -DLUA_USE_LINENOISE
+LUA_DEPENDENCIES = linenoise
+LUA_MYLIBS += -llinenoise
+LUA_CFLAGS += -DLUA_USE_LINENOISE
 endif
+endif
+
+ifeq ($(BR2_PACKAGE_LUA_32BITS),y)
+define LUA_32BITS_LUACONF
+	$(SED) 's/\/\* #define LUA_32BITS \*\//#define LUA_32BITS/' $(@D)/src/luaconf.h
+endef
+
+LUA_POST_PATCH_HOOKS += LUA_32BITS_LUACONF
 endif
 
 # We never want to have host-readline and host-ncurses as dependencies

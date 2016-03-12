@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-FREETYPE_VERSION = 2.5.4
+FREETYPE_VERSION = 2.6.3
 FREETYPE_SOURCE = freetype-$(FREETYPE_VERSION).tar.bz2
 FREETYPE_SITE = http://downloads.sourceforge.net/project/freetype/freetype2/$(FREETYPE_VERSION)
 FREETYPE_INSTALL_STAGING = YES
@@ -70,34 +70,10 @@ define FREETYPE_FIX_CONFIG_FILE_LIBS
 endef
 FREETYPE_POST_INSTALL_STAGING_HOOKS += FREETYPE_FIX_CONFIG_FILE_LIBS
 
-# Version 2.5.1 reorganized headers out of freetype2/freetype.
-# It is unexpected for some packages so symlink it until it spreads
-# upstream. Note that we also have to remove the symlink prior to the
-# installation process, because the installation process of freetype
-# removes usr/include/Freetype2/freetype/config, before installing
-# something in usr/include/Freetype2/config/ which no longer exists
-# due to the symbolic link.
-define FREETYPE_REMOVE_FREETYPE_INCLUDE_SYMLINK
-	$(RM) -f $(STAGING_DIR)/usr/include/freetype2/freetype
-endef
-FREETYPE_PRE_INSTALL_STAGING_HOOKS += FREETYPE_REMOVE_FREETYPE_INCLUDE_SYMLINK
-define FREETYPE_FIX_FREETYPE_INCLUDE
-	ln -sf . $(STAGING_DIR)/usr/include/freetype2/freetype
-endef
-FREETYPE_POST_INSTALL_STAGING_HOOKS += FREETYPE_FIX_FREETYPE_INCLUDE
-
-define HOST_FREETYPE_REMOVE_FREETYPE_INCLUDE_SYMLINK
-	$(RM) -f $(HOST_DIR)/usr/include/freetype2/freetype
-endef
-HOST_FREETYPE_PRE_INSTALL_HOOKS += HOST_FREETYPE_REMOVE_FREETYPE_INCLUDE_SYMLINK
-define HOST_FREETYPE_FIX_FREETYPE_INCLUDE
-	ln -sf . $(HOST_DIR)/usr/include/freetype2/freetype
-endef
-HOST_FREETYPE_POST_INSTALL_HOOKS += HOST_FREETYPE_FIX_FREETYPE_INCLUDE
-
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
 
-# freetype-patch uses autogen.sh so add it as a order-only-prerequisite
-# because it is a phony target.
-$(FREETYPE_TARGET_PATCH): | host-automake
+# freetype-patch and host-freetype-patch use autogen.sh so add
+# host-automake as a order-only-prerequisite because it is a phony
+# target.
+$(FREETYPE_TARGET_PATCH) $(HOST_FREETYPE_TARGET_PATCH): | host-automake

@@ -6,7 +6,7 @@
 
 PYTHON_REPORTLAB_VERSION = 2.7
 PYTHON_REPORTLAB_SOURCE = reportlab-$(PYTHON_REPORTLAB_VERSION).tar.gz
-PYTHON_REPORTLAB_SITE = https://pypi.python.org/packages/source/r/reportlab/
+PYTHON_REPORTLAB_SITE = https://pypi.python.org/packages/source/r/reportlab
 PYTHON_REPORTLAB_DEPENDENCIES = python zlib freetype jpeg tiff host-python-setuptools
 
 define PYTHON_REPORTLAB_BUILD_CMDS

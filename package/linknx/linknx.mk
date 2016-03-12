@@ -8,10 +8,14 @@ LINKNX_VERSION = 0.0.1.32
 LINKNX_SITE = http://downloads.sourceforge.net/project/linknx/linknx/linknx-$(LINKNX_VERSION)
 LINKNX_LICENSE = GPLv2+
 LINKNX_INSTALL_STAGING = YES
-LINKNX_CONF_OPTS = --without-lua --without-log4cpp --without-pth-test \
-		  --with-pth=$(STAGING_DIR)/usr --disable-smtp
+LINKNX_CONF_OPTS = \
+	--without-lua \
+	--without-log4cpp \
+	--without-pth-test \
+	--with-pth=$(STAGING_DIR)/usr \
+	--disable-smtp
 
-LINKNX_DEPENDENCIES = libpthsem
+LINKNX_DEPENDENCIES = libpthsem $(if $(BR2_PACKAGE_ARGP_STANDALONE),argp-standalone)
 
 ifeq ($(BR2_PACKAGE_MYSQL),y)
 LINKNX_CONF_OPTS += --with-mysql=$(STAGING_DIR)/usr/bin/mysql_config

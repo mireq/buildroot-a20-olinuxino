@@ -4,14 +4,14 @@
 #
 ################################################################################
 
-PINENTRY_VERSION = 0.9.0
+PINENTRY_VERSION = 0.9.4
 PINENTRY_SOURCE = pinentry-$(PINENTRY_VERSION).tar.bz2
 PINENTRY_SITE = ftp://ftp.gnupg.org/gcrypt/pinentry
 PINENTRY_LICENSE = GPLv2+
 PINENTRY_LICENSE_FILES = COPYING
-PINENTRY_DEPENDENCIES = $(if $(BR2_PACKAGE_LIBICONV),libiconv)
-PINENTRY_CONF_OPTS = --disable-pinentry-gtk # gtk1
-PINENTRY_CONF_OPTS += --disable-pinentry-qt  # qt3
+PINENTRY_DEPENDENCIES = \
+	$(if $(BR2_PACKAGE_LIBICONV),libiconv) \
+	host-pkgconf
 PINENTRY_CONF_OPTS += --without-libcap       # requires PAM
 
 # build with X if available
@@ -21,9 +21,16 @@ else
 PINENTRY_CONF_OPTS += --without-x
 endif
 
+ifeq ($(BR2_PACKAGE_LIBSECRET),y)
+PINENTRY_CONF_OPTS += --enable-libsecret
+PINENTRY_DEPENDENCIES += libsecret
+else
+PINENTRY_CONF_OPTS += --disable-libsecret
+endif
+
 # pinentry-ncurses backend
 ifeq ($(BR2_PACKAGE_PINENTRY_NCURSES),y)
-PINENTRY_CONF_OPTS += --enable-ncurses
+PINENTRY_CONF_OPTS += --enable-ncurses --with-ncurses-include-dir=none
 PINENTRY_DEPENDENCIES += ncurses
 else
 PINENTRY_CONF_OPTS += --disable-ncurses
@@ -41,7 +48,7 @@ endif
 ifeq ($(BR2_PACKAGE_PINENTRY_QT4),y)
 # -pthread needs to be passed for certain toolchains
 # http://autobuild.buildroot.net/results/6be/6be109ccedec603a67cebdb31b55865dcce0e128/
-PINENTRY_CONF_OPTS += LIBS=-pthread
+PINENTRY_CONF_OPTS += LIBS=-pthread MOC=$(HOST_DIR)/usr/bin/moc
 PINENTRY_CONF_OPTS += --enable-pinentry-qt4
 PINENTRY_DEPENDENCIES += qt
 else

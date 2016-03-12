@@ -40,8 +40,8 @@ define BERKELEYDB_CONFIGURE_CMDS
 		$(SHARED_STATIC_LIBS_OPTS) \
 		--with-pic \
 		--enable-o_direct \
+		$(if $(BR2_TOOLCHAIN_HAS_THREADS),--enable-mutexsupport,--disable-mutexsupport) \
 	)
-	$(SED) 's/\.lo/.o/g' $(@D)/build_unix/Makefile
 endef
 
 ifneq ($(BR2_PACKAGE_BERKELEYDB_TOOLS),y)

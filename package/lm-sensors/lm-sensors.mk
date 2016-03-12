@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-LM_SENSORS_VERSION = 3.3.5
+LM_SENSORS_VERSION = 3.4.0
 LM_SENSORS_SOURCE = lm_sensors-$(LM_SENSORS_VERSION).tar.bz2
-LM_SENSORS_SITE = http://dl.lm-sensors.org/lm-sensors/releases
+LM_SENSORS_SITE = ftp://ftp.netroedge.com/pub/lm-sensors
 LM_SENSORS_INSTALL_STAGING = YES
 LM_SENSORS_DEPENDENCIES = host-bison host-flex
 LM_SENSORS_LICENSE = libsensors LGPLv2.1+, programs GPLv2+
@@ -29,6 +29,12 @@ ifeq ($(BR2_STATIC_LIBS),y)
 LM_SENSORS_MAKE_OPTS += BUILD_SHARED_LIB=0
 else
 LM_SENSORS_MAKE_OPTS += BUILD_SHARED_LIB=1
+endif
+
+ifeq ($(BR2_SHARED_LIBS),y)
+LM_SENSORS_MAKE_OPTS += BUILD_STATIC_LIB=0
+else
+LM_SENSORS_MAKE_OPTS += BUILD_STATIC_LIB=1
 endif
 
 define LM_SENSORS_BUILD_CMDS

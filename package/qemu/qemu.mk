@@ -4,10 +4,10 @@
 #
 ################################################################################
 
-QEMU_VERSION = 2.1.2
+QEMU_VERSION = 2.5.0
 QEMU_SOURCE = qemu-$(QEMU_VERSION).tar.bz2
 QEMU_SITE = http://wiki.qemu.org/download
-QEMU_LICENSE = GPLv2 LGPLv2.1 MIT BSD-3c BSD-2c Others/BSD-1c
+QEMU_LICENSE = GPLv2, LGPLv2.1, MIT, BSD-3c, BSD-2c, Others/BSD-1c
 QEMU_LICENSE_FILES = COPYING COPYING.LIB
 # NOTE: there is no top-level license file for non-(L)GPL licenses;
 #       the non-(L)GPL license texts are specified in the affected
@@ -16,13 +16,12 @@ QEMU_LICENSE_FILES = COPYING COPYING.LIB
 #-------------------------------------------------------------
 # Host-qemu
 
-HOST_QEMU_DEPENDENCIES = host-pkgconf host-zlib host-libglib2 host-pixman
+HOST_QEMU_DEPENDENCIES = host-pkgconf host-python host-zlib host-libglib2 host-pixman
 
 #       BR ARCH         qemu
 #       -------         ----
 #       arm             arm
 #       armeb           armeb
-#       avr32           not supported
 #       bfin            not supported
 #       i386            i386
 #       i486            i386
@@ -33,14 +32,14 @@ HOST_QEMU_DEPENDENCIES = host-pkgconf host-zlib host-libglib2 host-pixman
 #       microblaze      microblaze
 #       mips            mips
 #       mipsel          mipsel
-#       mips64          ?
-#       mips64el        ?
+#       mips64          mips64
+#       mips64el        mips64el
 #       powerpc         ppc
 #       sh2a            not supported
 #       sh4             sh4
 #       sh4eb           sh4eb
-#       sh4a            ?
-#       sh4aeb          ?
+#       sh4a            sh4
+#       sh4aeb          sh4eb
 #       sh64            not supported
 #       sparc           sparc
 
@@ -57,7 +56,41 @@ endif
 ifeq ($(HOST_QEMU_ARCH),powerpc)
 HOST_QEMU_ARCH = ppc
 endif
+ifeq ($(HOST_QEMU_ARCH),sh4a)
+HOST_QEMU_ARCH = sh4
+endif
+ifeq ($(HOST_QEMU_ARCH),sh4aeb)
+HOST_QEMU_ARCH = sh4eb
+endif
 HOST_QEMU_TARGETS = $(HOST_QEMU_ARCH)-linux-user
+
+ifeq ($(BR2_PACKAGE_HOST_QEMU),y)
+HOST_QEMU_HOST_SYSTEM_TYPE = $(shell uname -s)
+ifneq ($(HOST_QEMU_HOST_SYSTEM_TYPE),Linux)
+$(error "qemu-user can only be used on Linux hosts")
+endif
+
+# kernel version as major*256 + minor
+HOST_QEMU_HOST_SYSTEM_VERSION = $(shell uname -r | awk -F. '{ print $$1 * 256 + $$2 }')
+HOST_QEMU_TARGET_SYSTEM_VERSION = $(shell echo $(BR2_TOOLCHAIN_HEADERS_AT_LEAST) | awk -F. '{ print $$1 * 256 + $$2 }')
+HOST_QEMU_COMPARE_VERSION = $(shell test $(HOST_QEMU_HOST_SYSTEM_VERSION) -ge $(HOST_QEMU_TARGET_SYSTEM_VERSION) && echo OK)
+
+#
+# The principle of qemu-user is that it emulates the instructions of
+# the target architecture when running the binary, and then when this
+# binary does a system call, it converts this system call into a
+# system call on the host machine. This mechanism makes an assumption:
+# that the target binary will not do system calls that do not exist on
+# the host. This basically requires that the target binary should be
+# built with kernel headers that are older or the same as the kernel
+# version running on the host machine.
+#
+ifeq ($(BR_BUILDING),y)
+ifneq ($(HOST_QEMU_COMPARE_VERSION),OK)
+$(error "Refusing to build qemu-user: target Linux version newer than host's.")
+endif
+endif
+endif
 
 define HOST_QEMU_CONFIGURE_CMDS
 	cd $(@D); $(HOST_CONFIGURE_OPTS) ./configure    \
@@ -66,6 +99,7 @@ define HOST_QEMU_CONFIGURE_CMDS
 		--interp-prefix=$(STAGING_DIR)          \
 		--cc="$(HOSTCC)"                        \
 		--host-cc="$(HOSTCC)"                   \
+		--python=$(HOST_DIR)/usr/bin/python2    \
 		--extra-cflags="$(HOST_CFLAGS)"         \
 		--extra-ldflags="$(HOST_LDFLAGS)"
 endef
@@ -163,7 +197,6 @@ define QEMU_CONFIGURE_CMDS
 			--disable-curses                \
 			--disable-curl                  \
 			--disable-bluez                 \
-			--disable-guest-base            \
 			--disable-uuid                  \
 			--disable-vde                   \
 			--disable-linux-aio             \
@@ -173,7 +206,6 @@ define QEMU_CONFIGURE_CMDS
 			--disable-rbd                   \
 			--disable-libiscsi              \
 			--disable-usb-redir             \
-			--disable-smartcard-nss         \
 			--disable-strip                 \
 			--disable-seccomp               \
 			--disable-sparse                \

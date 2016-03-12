@@ -1,4 +1,2 @@
-# Hashes from: http://download.qt-project.org/official_releases/qt/5.3/5.3.2/submodules/qtsensors-opensource-src-5.3.2.tar.xz.mirrorlist
-sha256 f9359dc42fbd7105eec7a1fb866e90aa772fd694075e5a5691d1a31d08953ae4 qtsensors-opensource-src-5.3.2.tar.xz
-sha1   de5099d494b6f898831f316eee90654f5e96ba22                         qtsensors-opensource-src-5.3.2.tar.xz
-md5    d0a8dc3173bfc9dc9f2632d509a76e6f                                 qtsensors-opensource-src-5.3.2.tar.xz
+# Hash from: http://download.qt.io/official_releases/qt/5.5/5.5.1/submodules/qtsensors-opensource-src-5.5.1.tar.xz.mirrorlist
+sha256 5d264fc0729a5d7679bd4eb8d7a0a9b142ed38d09fa68fc7dfe57f64afc8eeea qtsensors-opensource-src-5.5.1.tar.xz

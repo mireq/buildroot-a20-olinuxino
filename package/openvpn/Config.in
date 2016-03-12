@@ -1,10 +1,5 @@
-comment "openvpn needs a toolchain w/ IPv6"
-	depends on BR2_USE_MMU
-	depends on !BR2_INET_IPV6
-
 config BR2_PACKAGE_OPENVPN
 	bool "openvpn"
-	depends on BR2_INET_IPV6
 	depends on BR2_USE_MMU # fork()
 	help
 	  OpenVPN is a full-featured SSL VPN solution which can
@@ -31,6 +26,12 @@ config BR2_PACKAGE_OPENVPN_SMALL
 	  Make OpenVPN as small as possible.
 	  You loose eurephia, debugging info, help messages and more.
 	  It saves around 100 KiB in binary file size.
+
+config BR2_PACKAGE_OPENVPN_PWSAVE
+	bool "Allow passwords in files"
+	help
+	  Allow --askpass and --auth-user-pass passwords to be read
+	  from a file.
 
 choice
 	prompt "Crypto backend"

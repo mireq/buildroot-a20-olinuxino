@@ -1,2 +1,2 @@
-# Locally calculated after checking pgp signature
-sha256	b7b5fdda78849955e0cdbc5a085f3a08f8b7fba126c622085debb62def5d6388	gnupg-1.4.18.tar.bz2
+# From https://lists.gnupg.org/pipermail/gnupg-announce/2015q4/000382.html
+sha1	cbc9d960e3d8488c32675019a79fbfbf8680387e	gnupg-1.4.20.tar.bz2

@@ -34,7 +34,7 @@ SDL_DEPENDENCIES += directfb
 SDL_CONF_OPTS += --enable-video-directfb=yes
 SDL_CONF_ENV = ac_cv_path_DIRECTFBCONFIG=$(STAGING_DIR)/usr/bin/directfb-config
 else
-SDL_CONF_OPTS = --enable-video-directfb=no
+SDL_CONF_OPTS += --enable-video-directfb=no
 endif
 
 ifeq ($(BR2_PACKAGE_SDL_QTOPIA),y)
@@ -46,7 +46,8 @@ endif
 
 ifeq ($(BR2_PACKAGE_SDL_X11),y)
 SDL_CONF_OPTS += --enable-video-x11=yes
-SDL_DEPENDENCIES += xlib_libX11 xlib_libXext \
+SDL_DEPENDENCIES += \
+	xlib_libX11 xlib_libXext \
 	$(if $(BR2_PACKAGE_XLIB_LIBXRENDER), xlib_libXrender) \
 	$(if $(BR2_PACKAGE_XLIB_LIBXRANDR), xlib_libXrandr)
 else
@@ -55,6 +56,15 @@ endif
 
 ifneq ($(BR2_USE_MMU),y)
 SDL_CONF_OPTS += --enable-dga=no
+endif
+
+# overwrite autodection (prevents confusion with host libpth version)
+ifeq ($(BR2_PACKAGE_LIBPTHSEM_COMPAT),y)
+SDL_CONF_OPTS += --enable-pth
+SDL_CONF_ENV += ac_cv_path_PTH_CONFIG=$(STAGING_DIR)/usr/bin/pth-config
+SDL_DEPENDENCIES += libpthsem
+else
+SDL_CONF_OPTS += --disable-pth
 endif
 
 ifeq ($(BR2_PACKAGE_TSLIB),y)
@@ -69,18 +79,20 @@ ifeq ($(BR2_PACKAGE_MESA3D),y)
 SDL_DEPENDENCIES += mesa3d
 endif
 
-SDL_CONF_OPTS += --enable-pulseaudio=no \
-		--disable-arts \
-		--disable-esd \
-		--disable-nasm \
-		--disable-video-ps3
+SDL_CONF_OPTS += \
+	--enable-pulseaudio=no \
+	--disable-arts \
+	--disable-esd \
+	--disable-nasm \
+	--disable-video-ps3
 
-HOST_SDL_CONF_OPTS += --enable-pulseaudio=no \
-		--enable-video-x11=no \
-		--disable-arts \
-		--disable-esd \
-		--disable-nasm \
-		--disable-video-ps3
+HOST_SDL_CONF_OPTS += \
+	--enable-pulseaudio=no \
+	--enable-video-x11=no \
+	--disable-arts \
+	--disable-esd \
+	--disable-nasm \
+	--disable-video-ps3
 
 SDL_CONFIG_SCRIPTS = sdl-config
 

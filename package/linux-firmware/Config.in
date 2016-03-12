@@ -17,6 +17,15 @@ config BR2_PACKAGE_LINUX_FIRMWARE_INTEL_SST_DSP
 
 endmenu # Audio
 
+menu "Video firmware"
+
+config BR2_PACKAGE_LINUX_FIRMWARE_RADEON
+	bool "AMD Radeon video card firmware"
+	help
+	  Firmware files for AMD Radeon video cards.
+
+endmenu # Video
+
 menu "WiFi firmware"
 
 config BR2_PACKAGE_LINUX_FIRMWARE_ATHEROS_6002
@@ -70,6 +79,12 @@ config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_5000
 	bool "Intel iwlwifi 5000"
 	help
 	  Firmware files for the Intel Wifi 5000 devices supported by
+	  the iwlwifi kernel driver.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_6000G2A
+	bool "Intel iwlwifi 6000G2A"
+	help
+	  Firmware files for the Intel Wifi 6000G2A devices supported by
 	  the iwlwifi kernel driver.
 
 config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_7260
@@ -140,9 +155,44 @@ config BR2_PACKAGE_LINUX_FIRMWARE_LIBERTAS_SD8688
 	  Firmware files for the Marvell SD8688 module
 
 config BR2_PACKAGE_LINUX_FIRMWARE_MWIFIEX_SD8787
-	bool "Marvell Wifi-Ex SD 8787"
+	bool "Marvell Wifi-Ex 8787 SDIO"
 	help
 	  Firmware files for the Marvell Wifi-Ex 8787 module on SDIO.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_MWIFIEX_SD8797
+	bool "Marvell Wifi-Ex 8797 SDIO"
+	help
+	  Firmware files for the Marvell Wifi-Ex 8797 module on SDIO.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_MWIFIEX_USB8797
+	bool "Marvell Wifi-Ex 8797 USB"
+	help
+	  Firmware files for the Marvell Wifi-Ex 8797 module on USB.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_MWIFIEX_SD8887
+	bool "Marvell Wifi-Ex 8887 SDIO"
+	help
+	  Firmware files for the Marvell Wifi-Ex 8887 module on SDIO.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_MWIFIEX_SD8897
+	bool "Marvell Wifi-Ex 8897 SDIO"
+	help
+	  Firmware files for the Marvell Wifi-Ex 8897 module on SDIO.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_MWIFIEX_USB8897
+	bool "Marvell Wifi-Ex 8897 USB"
+	help
+	  Firmware files for the Marvell Wifi-Ex 8897 module on USB.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_MWIFIEX_PCIE8897
+	bool "Marvell Wifi-Ex 8897 PCI-E"
+	help
+	  Firmware files for the Marvell Wifi-Ex 8897 module on PCI-E.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_MEDIATEK_MT7601U
+	bool "MediaTek MT7601U"
+	help
+	  MediaTek MT7601U
 
 config BR2_PACKAGE_LINUX_FIRMWARE_RALINK_RT61
 	bool "Ralink rt2501/rt61"

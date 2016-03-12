@@ -5,7 +5,7 @@
 ################################################################################
 
 LIBGTK3_VERSION_MAJOR = 3.14
-LIBGTK3_VERSION = $(LIBGTK3_VERSION_MAJOR).5
+LIBGTK3_VERSION = $(LIBGTK3_VERSION_MAJOR).15
 LIBGTK3_SOURCE = gtk+-$(LIBGTK3_VERSION).tar.xz
 LIBGTK3_SITE = http://ftp.gnome.org/pub/gnome/sources/gtk+/$(LIBGTK3_VERSION_MAJOR)
 LIBGTK3_LICENSE = LGPLv2+
@@ -18,7 +18,8 @@ LIBGTK3_CONF_ENV = \
 	ac_cv_path_GDK_PIXBUF_CSOURCE=$(HOST_DIR)/usr/bin/gdk-pixbuf-csource \
 	PKG_CONFIG_FOR_BUILD=$(HOST_DIR)/usr/bin/pkgconf
 
-LIBGTK3_CONF_OPTS = --disable-glibtest \
+LIBGTK3_CONF_OPTS = \
+	--disable-glibtest \
 	--enable-explicit-deps=no \
 	--enable-gtk2-dependency \
 	--disable-introspection
@@ -147,8 +148,8 @@ HOST_LIBGTK3_DEPENDENCIES = \
 	host-gdk-pixbuf \
 	host-pkgconf
 
-HOST_LIBGTK3_CFLAGS = $(shell $(HOST_DIR)/usr/bin/pkgconf \
-		      --cflags --libs gdk-pixbuf-2.0)
+HOST_LIBGTK3_CFLAGS = \
+	`$(HOST_DIR)/usr/bin/pkgconf --cflags --libs gdk-pixbuf-2.0`
 
 define HOST_LIBGTK3_CONFIGURE_CMDS
 	echo "#define GETTEXT_PACKAGE \"gtk30\"" >> $(@D)/gtk/config.h

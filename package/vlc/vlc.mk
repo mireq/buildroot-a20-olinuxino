@@ -4,13 +4,16 @@
 #
 ################################################################################
 
-VLC_VERSION = 2.1.5
-VLC_SITE = http://download.videolan.org/pub/videolan/vlc/$(VLC_VERSION)
+VLC_VERSION = 2.2.2
+VLC_SITE = http://get.videolan.org/vlc/$(VLC_VERSION)
 VLC_SOURCE = vlc-$(VLC_VERSION).tar.xz
 VLC_LICENSE = GPLv2+ LGPLv2.1+
 VLC_LICENSE_FILES = COPYING COPYING.LIB
 VLC_DEPENDENCIES = host-pkgconf
 VLC_AUTORECONF = YES
+
+# Install vlc libraries in staging.
+VLC_INSTALL_STAGING = YES
 
 # VLC defines two autoconf functions which are also defined by our own pkg.m4
 # from pkgconf. Unfortunately, they are defined in a different way: VLC adds
@@ -24,13 +27,12 @@ endef
 VLC_POST_PATCH_HOOKS += VLC_OVERRIDE_PKG_M4
 
 VLC_CONF_OPTS += \
+	--disable-gles1 \
 	--disable-a52 \
 	--disable-shout \
 	--disable-twolame \
 	--disable-dca \
-	--disable-dirac \
 	--disable-schroedinger \
-	--disable-quicksync \
 	--disable-fluidsynth \
 	--disable-zvbi \
 	--disable-kate \
@@ -42,7 +44,17 @@ VLC_CONF_OPTS += \
 	--disable-projectm \
 	--disable-vsxu \
 	--disable-mtp \
-	--disable-opencv
+	--disable-mmal-codec \
+	--disable-mmal-vout \
+	--disable-dvdnav \
+	--disable-vpx \
+	--disable-jpeg \
+	--disable-x262 \
+	--disable-x265 \
+	--disable-mfx \
+	--disable-vdpau \
+	--disable-addonmanagermodules \
+	--enable-run-as-root \
 
 # Building static and shared doesn't work, so force static off.
 ifeq ($(BR2_STATIC_LIBS),)
@@ -53,6 +65,12 @@ ifeq ($(BR2_POWERPC_CPU_HAS_ALTIVEC),y)
 VLC_CONF_OPTS += --enable-altivec
 else
 VLC_CONF_OPTS += --disable-altivec
+endif
+
+ifeq ($(BR2_X86_CPU_HAS_SSE),y)
+VLC_CONF_OPTS += --enable-sse
+else
+VLC_CONF_OPTS += --disable-sse
 endif
 
 ifeq ($(BR2_PACKAGE_ALSA_LIB),y)
@@ -79,6 +97,7 @@ endif
 
 ifeq ($(BR2_PACKAGE_DIRECTFB),y)
 VLC_CONF_OPTS += --enable-directfb
+VLC_CONF_ENV += ac_cv_path_DIRECTFB_CONFIG=$(STAGING_DIR)/usr/bin/directfb-config
 VLC_DEPENDENCIES += directfb
 else
 VLC_CONF_OPTS += --disable-directfb
@@ -117,11 +136,33 @@ else
 VLC_CONF_OPTS += --disable-flac
 endif
 
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
-VLC_CONF_OPTS += --enable-glx
-VLC_DEPENDENCIES += libgl
+ifeq ($(BR2_PACKAGE_FREERDP),y)
+VLC_CONF_OPTS += --enable-freerdp
+VLC_DEPENDENCIES += freerdp
 else
-VLC_CONF_OPTS += --disable-glx
+VLC_CONF_OPTS += --disable-libfreerdp
+endif
+
+ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+VLC_DEPENDENCIES += libgl
+endif
+
+ifeq ($(BR2_PACKAGE_HAS_LIBGLES),y)
+VLC_CONF_OPTS += --enable-gles2
+VLC_DEPENDENCIES += libgles
+else
+VLC_CONF_OPTS += --disable-gles2
+endif
+
+ifeq ($(BR2_PACKAGE_OPENCV)$(BR2_PACKAGE_OPENCV3),y)
+VLC_CONF_OPTS += --enable-opencv
+ifeq ($(BR2_PACKAGE_OPENCV),y)
+VLC_DEPENDENCIES += opencv
+else
+VLC_DEPENDENCIES += opencv3
+endif
+else
+VLC_CONF_OPTS += --disable-opencv
 endif
 
 ifeq ($(BR2_PACKAGE_OPUS),y)
@@ -138,6 +179,27 @@ else
 VLC_CONF_OPTS += --disable-libass
 endif
 
+ifeq ($(BR2_PACKAGE_LIBBLURAY),y)
+VLC_CONF_OPTS += --enable-bluray
+VLC_DEPENDENCIES += libbluray
+else
+VLC_CONF_OPTS += --disable-bluray
+endif
+
+ifeq ($(BR2_PACKAGE_LIBCDDB),y)
+VLC_CONF_OPTS += --enable-libcddb
+VLC_DEPENDENCIES += libcddb
+else
+VLC_CONF_OPTS += --disable-libcddb
+endif
+
+ifeq ($(BR2_PACKAGE_LIBDVBPSI),y)
+VLC_CONF_OPTS += --enable-dvbpsi
+VLC_DEPENDENCIES += libdvbpsi
+else
+VLC_CONF_OPTS += --disable-dvbpsi
+endif
+
 ifeq ($(BR2_PACKAGE_LIBGCRYPT),y)
 VLC_CONF_OPTS += --enable-libgcrypt
 VLC_DEPENDENCIES += libgcrypt
@@ -152,6 +214,13 @@ VLC_CONF_OPTS += --enable-mad
 VLC_DEPENDENCIES += libmad
 else
 VLC_CONF_OPTS += --disable-mad
+endif
+
+ifeq ($(BR2_PACKAGE_LIBMATROSKA),y)
+VLC_CONF_OPTS += --enable-mkv
+VLC_DEPENDENCIES += libmatroska
+else
+VLC_CONF_OPTS += --disable-mkv
 endif
 
 ifeq ($(BR2_PACKAGE_LIBMODPLUG),y)
@@ -176,10 +245,24 @@ VLC_CONF_OPTS += --disable-png
 endif
 
 ifeq ($(BR2_PACKAGE_LIBRSVG),y)
-VLC_CONF_OPTS += --enable-svg
+VLC_CONF_OPTS += --enable-svg --enable-svgdec
 VLC_DEPENDENCIES += librsvg
 else
-VLC_CONF_OPTS += --disable-svg
+VLC_CONF_OPTS += --disable-svg --disable-svgdec
+endif
+
+ifeq ($(BR2_PACKAGE_LIBSSH2),y)
+VLC_CONF_OPTS += --enable-sftp
+VLC_DEPENDENCIES += libssh2
+else
+VLC_CONF_OPTS += --disable-sftp
+endif
+
+ifeq ($(BR2_PACKAGE_LIBSIDPLAY2),y)
+VLC_CONF_OPTS += --enable-sid
+VLC_DEPENDENCIES += libsidplay2
+else
+VLC_CONF_OPTS += --disable-sid
 endif
 
 ifeq ($(BR2_PACKAGE_LIBTHEORA),y)
@@ -194,6 +277,13 @@ VLC_CONF_OPTS += --enable-upnp
 VLC_DEPENDENCIES += libupnp
 else
 VLC_CONF_OPTS += --disable-upnp
+endif
+
+ifeq ($(BR2_PACKAGE_LIBVNCSERVER),y)
+VLC_CONF_OPTS += --enable-vnc
+VLC_DEPENDENCIES += libvncserver
+else
+VLC_CONF_OPTS += --disable-vnc
 endif
 
 ifeq ($(BR2_PACKAGE_LIBVORBIS),y)
@@ -246,6 +336,17 @@ else
 VLC_CONF_OPTS += --disable-lua
 endif
 
+ifeq ($(BR2_PACKAGE_MINIZIP),y)
+VLC_DEPENDENCIES += minizip
+endif
+
+ifeq ($(BR2_PACKAGE_MUSEPACK),y)
+VLC_CONF_OPTS += --enable-mpc
+VLC_DEPENDENCIES += musepack
+else
+VLC_CONF_OPTS += --disable-mpc
+endif
+
 ifeq ($(BR2_PACKAGE_QT_GUI_MODULE),y)
 VLC_CONF_OPTS += --enable-qt
 VLC_CONF_ENV += \
@@ -278,6 +379,13 @@ else
 VLC_CONF_OPTS += --disable-speex
 endif
 
+ifeq ($(BR2_PACKAGE_TAGLIB),y)
+VLC_CONF_OPTS += --enable-taglib
+VLC_DEPENDENCIES += taglib
+else
+VLC_CONF_OPTS += --disable-taglib
+endif
+
 ifeq ($(BR2_PACKAGE_TREMOR),y)
 VLC_CONF_OPTS += --enable-tremor
 VLC_DEPENDENCIES += tremor
@@ -292,11 +400,22 @@ else
 VLC_CONF_OPTS += --disable-udev
 endif
 
+ifeq ($(BR2_PACKAGE_XCB_UTIL_KEYSYMS),y)
+VLC_CONF_OPTS += --enable-xcb
+VLC_DEPENDENCIES += xcb-util-keysyms
+else
+VLC_CONF_OPTS += --disable-xcb
+endif
+
 ifeq ($(BR2_PACKAGE_XLIB_LIBX11),y)
 VLC_CONF_OPTS += --with-x
 VLC_DEPENDENCIES += xlib_libX11
 else
 VLC_CONF_OPTS += --without-x
+endif
+
+ifeq ($(BR2_PACKAGE_ZLIB),y)
+VLC_DEPENDENCIES += zlib
 endif
 
 $(eval $(autotools-package))

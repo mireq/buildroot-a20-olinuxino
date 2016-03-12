@@ -12,7 +12,7 @@
 ################################################################################
 
 QT_VERSION_MAJOR = 4.8
-QT_VERSION = $(QT_VERSION_MAJOR).6
+QT_VERSION = $(QT_VERSION_MAJOR).7
 QT_SOURCE = qt-everywhere-opensource-src-$(QT_VERSION).tar.gz
 QT_SITE = http://download.qt-project.org/official_releases/qt/$(QT_VERSION_MAJOR)/$(QT_VERSION)
 QT_DEPENDENCIES = host-pkgconf
@@ -38,18 +38,12 @@ QT_CFLAGS = $(TARGET_CFLAGS)
 QT_CXXFLAGS = $(TARGET_CXXFLAGS)
 QT_LDFLAGS = $(TARGET_LDFLAGS)
 
-ifeq ($(BR2_LARGEFILE),y)
-QT_CONFIGURE_OPTS += -largefile
-else
-QT_CONFIGURE_OPTS += -no-largefile
-
-# embedded sqlite module forces FILE_OFFSET_BITS=64 unless this is defined
-# webkit internally uses this module as well
-ifneq ($(BR2_PACKAGE_QT_SQLITE_QT)$(BR2_PACKAGE_QT_WEBKIT),)
-QT_CFLAGS += -DSQLITE_DISABLE_LFS
-QT_CXXFLAGS += -DSQLITE_DISABLE_LFS
-endif
-
+# Qt has some assembly function that are not present in thumb1 mode:
+# Error: selected processor does not support Thumb mode `swp r3,r7,[r4]'
+# so, we desactivate thumb mode
+ifeq ($(BR2_ARM_INSTRUCTIONS_THUMB),y)
+QT_CFLAGS += -marm
+QT_CXXFLAGS += -marm
 endif
 
 ifeq ($(BR2_PACKAGE_QT_QT3SUPPORT),y)
@@ -209,6 +203,10 @@ else
 QT_CONFIGURE_OPTS += -static
 endif
 
+ifeq ($(BR2_STATIC_LIBS),y)
+QT_CONFIGURE_OPTS += -D QT_NO_DYNAMIC_LIBRARY
+endif
+
 ifeq ($(BR2_ENDIAN),"LITTLE")
 QT_CONFIGURE_OPTS += -little-endian
 else
@@ -217,8 +215,6 @@ endif
 
 ifeq ($(BR2_arm)$(BR2_armeb),y)
 QT_EMB_PLATFORM = arm
-else ifeq ($(BR2_avr32),y)
-QT_EMB_PLATFORM = avr32
 else ifeq ($(BR2_i386),y)
 QT_EMB_PLATFORM = x86
 else ifeq ($(BR2_x86_64),y)
@@ -227,11 +223,26 @@ else ifeq ($(BR2_mips)$(BR2_mipsel),y)
 QT_EMB_PLATFORM = mips
 else ifeq ($(BR2_powerpc),y)
 QT_EMB_PLATFORM = powerpc
+else ifeq ($(BR2_sh4)$(BR2_sh4eb)$(BR2_sh4a)$(BR2_sh4aeb),y)
+QT_EMB_PLATFORM = sh
 else
 QT_EMB_PLATFORM = generic
 endif
 
+ifeq ($(BR2_PACKAGE_QT_X11),y)
+QT_DEPENDENCIES += fontconfig xlib_libXi xlib_libX11 xlib_libXrender \
+	xlib_libXcursor xlib_libXrandr xlib_libXext xlib_libXv
+# Using pkg-config avoids us some logic to redefine and sed again mkspecs files
+# to add X11 include path and link options
+QT_CFLAGS += `$(PKG_CONFIG_HOST_BINARY) --cflags x11`
+QT_CXXFLAGS += `$(PKG_CONFIG_HOST_BINARY) --cflags x11`
+QT_LDFLAGS += `$(PKG_CONFIG_HOST_BINARY) --libs x11 xext`
+QT_CONFIGURE_OPTS += -arch $(QT_EMB_PLATFORM) \
+		-xplatform qws/linux-$(QT_EMB_PLATFORM)-g++ -x11 -no-gtkstyle -no-sm \
+		-no-openvg
+else # if BR2_PACKAGE_QT_EMBEDDED
 QT_CONFIGURE_OPTS += -embedded $(QT_EMB_PLATFORM)
+endif
 
 ifneq ($(BR2_PACKAGE_QT_GUI_MODULE),y)
 QT_CONFIGURE_OPTS += -no-gui
@@ -322,9 +333,9 @@ endif
 ifeq ($(BR2_PACKAGE_QT_OPENGL_ES),y)
 QT_CONFIGURE_OPTS += -opengl es2 -egl
 QT_DEPENDENCIES += libgles libegl
-QT_CFLAGS += $(shell $(PKG_CONFIG_HOST_BINARY) --cflags egl)
-QT_CXXFLAGS += $(shell $(PKG_CONFIG_HOST_BINARY) --cflags egl)
-QT_LDFLAGS += $(shell $(PKG_CONFIG_HOST_BINARY) --libs egl)
+QT_CFLAGS += `$(PKG_CONFIG_HOST_BINARY) --cflags egl`
+QT_CXXFLAGS += `$(PKG_CONFIG_HOST_BINARY) --cflags egl`
+QT_LDFLAGS += `$(PKG_CONFIG_HOST_BINARY) --libs egl`
 else
 QT_CONFIGURE_OPTS += -no-opengl
 endif
@@ -340,10 +351,10 @@ QT_DEPENDENCIES += mysql
 endif
 ifeq ($(BR2_PACKAGE_QT_ODBC),y)
 QT_CONFIGURE_OPTS += -qt-sql-odbc
+QT_DEPENDENCIES += unixodbc
 endif
 ifeq ($(BR2_PACKAGE_QT_PSQL),y)
-QT_CONFIGURE_OPTS += -qt-sql-psql
-QT_CONFIGURE_ENV += PSQL_LIBS=-L$(STAGING_DIR)/usr/lib
+QT_CONFIGURE_OPTS += -qt-sql-psql -psql_config $(STAGING_DIR)/usr/bin/pg_config
 QT_DEPENDENCIES += postgresql
 endif
 ifeq ($(BR2_PACKAGE_QT_SQLITE_QT),y)
@@ -466,15 +477,8 @@ QT_QMAKE = $(HOST_DIR)/usr/bin/qmake -spec qws/linux-$(QT_EMB_PLATFORM)-g++
 ################################################################################
 define QT_QMAKE_SET
 	$(SED) '/$(1)/d' $(3)/mkspecs/qws/linux-$(QT_EMB_PLATFORM)-g++/qmake.conf
-	$(SED) '/include.*qws.conf/a$(1) = $(2)' $(3)/mkspecs/qws/linux-$(QT_EMB_PLATFORM)-g++/qmake.conf
+	$(SED) "/include.*qws.conf/a$(1) = $(2)" $(3)/mkspecs/qws/linux-$(QT_EMB_PLATFORM)-g++/qmake.conf
 endef
-
-ifneq ($(BR2_INET_IPV6),y)
-define QT_CONFIGURE_IPV6
-	$(SED) 's/^CFG_IPV6=auto/CFG_IPV6=no/' $(@D)/configure
-	$(SED) 's/^CFG_IPV6IFNAME=auto/CFG_IPV6IFNAME=no/' $(@D)/configure
-endef
-endif
 
 ifneq ($(QT_CONFIG_FILE),)
 define QT_CONFIGURE_CONFIG_FILE
@@ -650,19 +654,38 @@ define QT_INSTALL_TARGET_IMPORTS
 endef
 
 # Fonts installation
+ifeq ($(BR2_PACKAGE_QT_EMBEDDED),y)
 ifneq ($(QT_FONTS),)
 define QT_INSTALL_TARGET_FONTS
 	mkdir -p $(TARGET_DIR)/usr/lib/fonts
 	cp -dpf $(QT_FONTS) $(TARGET_DIR)/usr/lib/fonts
 endef
+ifneq ($(BR2_PACKAGE_QT_FONT_MICRO)$(BR2_PACKAGE_QT_FONT_FIXED),)
+# as stated in the font source src/3rdparty/fonts/micro.bdf
+# source src/3rdparty/fonts/5x7.bdf and source src/3rdparty/fonts/6x13.bdf
+QT_LICENSE += , Public Domain (Micro/Fixed font)
 endif
+ifneq ($(BR2_PACKAGE_QT_FONT_HELVETICA)$(BR2_PACKAGE_QT_FONT_JAPANESE),)
+QT_LICENSE += , Adobe Helvetica license (Helvetica/Japanese fonts)
+QT_LICENSE_FILES += src/3rdparty/fonts/COPYING.Helvetica
+endif
+ifeq ($(BR2_PACKAGE_QT_FONT_UNIFONT),y)
+QT_LICENSE += , Freeware (Unifont font)
+QT_LICENSE_FILES += src/3rdparty/fonts/COPYRIGHT.Unifont
+endif
+endif # QT_FONTS
 
 ifeq ($(BR2_PACKAGE_QT_QTFREETYPE)$(BR2_PACKAGE_QT_SYSTEMFREETYPE),y)
 define QT_INSTALL_TARGET_FONTS_TTF
 	mkdir -p $(TARGET_DIR)/usr/lib/fonts
 	cp -dpf $(STAGING_DIR)/usr/lib/fonts/*.ttf $(TARGET_DIR)/usr/lib/fonts
 endef
+QT_LICENSE += , Bitstream license (DejaVu/Vera TrueType fonts)
+QT_LICENSE_FILES += src/3rdparty/fonts/COPYRIGHT.DejaVu \
+	src/3rdparty/fonts/README.DejaVu \
+	src/3rdparty/fonts/COPYRIGHT.Vera
 endif
+endif # BR2_PACKAGE_QT_EMBEDDED
 
 ifeq ($(BR2_PACKAGE_QT_GFX_POWERVR),y)
 define QT_INSTALL_TARGET_POWERVR

@@ -8,6 +8,8 @@ GUILE_VERSION = 2.0.11
 GUILE_SOURCE = guile-$(GUILE_VERSION).tar.xz
 GUILE_SITE = $(BR2_GNU_MIRROR)/guile
 GUILE_INSTALL_STAGING = YES
+# For 0002-calculate-csqrt_manually.patch
+GUILE_AUTORECONF = YES
 GUILE_LICENSE = LGPLv3+
 GUILE_LICENSE_FILES = LICENSE COPYING COPYING.LESSER
 
@@ -26,8 +28,27 @@ GUILE_CFLAGS = \
 	-DHAVE_GC_GET_FREE_SPACE_DIVISOR \
 	-DHAVE_GC_SET_FINALIZE_ON_DEMAND
 
+ifeq ($(BR2_STATIC_LIBS),y)
+GUILE_CFLAGS += -DGC_NO_DLOPEN
+endif
+
+# It can use readline, but on the condition that it was build against
+# ncurses. If both aren't present disable readline support since the
+# host readline/ncurses support can poison the build.
+ifeq ($(BR2_PACKAGE_NCURSES)$(BR2_PACKAGE_READLINE),yy)
+GUILE_CONF_OPTS += --with-libreadline-prefix=$(STAGING_DIR)/usr
+GUILE_DEPENDENCIES += readline
+else
+GUILE_CONF_OPTS += --without-libreadline-prefix
+endif
+
 GUILE_CONF_ENV += GUILE_FOR_BUILD=$(HOST_DIR)/usr/bin/guile \
 	CFLAGS="$(TARGET_CFLAGS) $(GUILE_CFLAGS)"
+
+GUILE_CONF_OPTS += \
+	--with-libltdl-prefix=$(STAGING_DIR)/usr/lib \
+	--with-libgmp-prefix=$(STAGING_DIR)/usr/lib \
+	--with-libunistring-prefix=$(STAGING_DIR)/usr/lib
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

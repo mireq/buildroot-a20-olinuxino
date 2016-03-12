@@ -1,11 +1,12 @@
-comment "strongswan needs a toolchain w/ threads"
+comment "strongswan needs a toolchain w/ threads, dynamic library"
 	depends on BR2_USE_MMU
-	depends on !BR2_TOOLCHAIN_HAS_THREADS
+	depends on !BR2_TOOLCHAIN_HAS_THREADS || BR2_STATIC_LIBS
 
 menuconfig BR2_PACKAGE_STRONGSWAN
 	bool "strongswan"
 	depends on BR2_USE_MMU # fork()
 	depends on BR2_TOOLCHAIN_HAS_THREADS
+	depends on !BR2_STATIC_LIBS
 	help
 	  strongSwan is an OpenSource IPsec implementation for the
 	  Linux operating system. It is based on the discontinued
@@ -21,9 +22,6 @@ menuconfig BR2_PACKAGE_STRONGSWAN
 	  http://www.strongswan.org/
 
 if BR2_PACKAGE_STRONGSWAN
-
-comment "kernel-netlink and socket-default options need a toolchain w/ IPv6"
-	depends on !BR2_INET_IPV6
 
 choice
 	prompt "Cryptographic backend"
@@ -110,13 +108,21 @@ config BR2_PACKAGE_STRONGSWAN_SQL
 
 endif
 
-config BR2_PACKAGE_STRONGSWAN_TOOLS
-	bool "Enable additional utilities (openac, scepclient and pki)"
+config BR2_PACKAGE_STRONGSWAN_PKI
+	bool "Enable pki certificate utility"
 	default y
 
+config BR2_PACKAGE_STRONGSWAN_SCEP
+	bool "Enable SCEP client tool"
+
 config BR2_PACKAGE_STRONGSWAN_SCRIPTS
-	bool "Enable additional utilities (found in directory scripts)"
-	depends on BR2_PACKAGE_STRONGSWAN_CHARON || BR2_PACKAGE_STRONGSWAN_TOOLS
+	bool "Enable additional utilities (found in scripts directory)"
+	depends on BR2_PACKAGE_STRONGSWAN_CHARON
+	default y
+
+config BR2_PACKAGE_STRONGSWAN_VICI
+	bool "Enable vici/swanctl"
+	depends on BR2_PACKAGE_STRONGSWAN_CHARON
 	default y
 
 endif

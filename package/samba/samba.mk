@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SAMBA_VERSION = 3.6.24
+SAMBA_VERSION = 3.6.25
 SAMBA_SITE = http://ftp.samba.org/pub/samba/stable
 SAMBA_SUBDIR = source3
 SAMBA_INSTALL_STAGING = YES
@@ -29,15 +29,15 @@ SAMBA_CONF_ENV = \
 	libreplace_cv_HAVE_SECURE_MKSTEMP=yes \
 	samba_cv_CC_NEGATIVE_ENUM_VALUES=yes \
 	samba_cv_fpie=no \
-	libreplace_cv_HAVE_IPV6=$(if $(BR2_INET_IPV6),yes,no) \
+	libreplace_cv_HAVE_IPV6=yes \
 	$(if $(BR2_PACKAGE_SAMBA_AVAHI),AVAHI_LIBS=-pthread)
 
 SAMBA_CONF_OPTS = \
-	--with-piddir=/var/run \
-	--with-lockdir=/var/lock \
-	--with-logfilebase=/var/log \
-	--with-configdir=/etc/samba \
-	--with-privatedir=/etc/samba \
+	--with-fhs \
+	--with-piddir=/var/run/samba \
+	--with-lockdir=/var/cache/samba \
+	--with-ncalrpcdir=/var/run/ncalrpc \
+	--with-nmbdsocketdir=/var/run/nmbd \
 	\
 	--disable-cups \
 	--enable-shared-libs \
@@ -137,16 +137,16 @@ SAMBA_POST_INSTALL_TARGET_HOOKS += SAMBA_REMOVE_UNNEEDED_BINARIES
 
 ifeq ($(BR2_PACKAGE_SAMBA_LIBNSS_WINS),y)
 define SAMBA_INSTALL_LIBNSS_WINS
-	$(INSTALL) -m 0755 -D $(@D)/nsswitch/libnss_wins.so $(TARGET_DIR)/lib/libnss_wins.so
-	ln -snf libnss_wins.so $(TARGET_DIR)/lib/libnss_wins.so.2
+	$(INSTALL) -m 0755 -D $(@D)/nsswitch/libnss_wins.so $(TARGET_DIR)/lib/libnss_wins.so.2
+	ln -snf libnss_wins.so.2 $(TARGET_DIR)/lib/libnss_wins.so
 endef
 SAMBA_POST_INSTALL_TARGET_HOOKS += SAMBA_INSTALL_LIBNSS_WINS
 endif
 
 ifeq ($(BR2_PACKAGE_SAMBA_LIBNSS_WINBIND),y)
 define SAMBA_INSTALL_LIBNSS_WINBIND
-	$(INSTALL) -m 0755 -D $(@D)/nsswitch/libnss_winbind.so $(TARGET_DIR)/lib/libnss_winbind.so
-	ln -snf libnss_winbind.so $(TARGET_DIR)/lib/libnss_winbind.so.2
+	$(INSTALL) -m 0755 -D $(@D)/nsswitch/libnss_winbind.so $(TARGET_DIR)/lib/libnss_winbind.so.2
+	ln -snf libnss_winbind.so.2 $(TARGET_DIR)/lib/libnss_winbind.so
 endef
 SAMBA_POST_INSTALL_TARGET_HOOKS += SAMBA_INSTALL_LIBNSS_WINBIND
 endif

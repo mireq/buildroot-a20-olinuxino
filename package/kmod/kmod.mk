@@ -4,12 +4,10 @@
 #
 ################################################################################
 
-KMOD_VERSION = 19
+KMOD_VERSION = 22
 KMOD_SOURCE = kmod-$(KMOD_VERSION).tar.xz
 KMOD_SITE = $(BR2_KERNEL_MIRROR)/linux/utils/kernel/kmod
 KMOD_INSTALL_STAGING = YES
-# For kmod-0002-add-backup-implementation-of-be32toh.patch
-KMOD_AUTORECONF = YES
 KMOD_DEPENDENCIES = host-pkgconf
 HOST_KMOD_DEPENDENCIES = host-pkgconf
 
@@ -39,11 +37,6 @@ KMOD_DEPENDENCIES += $(if $(BR2_PACKAGE_PYTHON),python,python3)
 KMOD_CONF_OPTS += --enable-python
 endif
 
-# --gc-sections triggers a bug in the current Xtensa binutils
-ifeq ($(BR2_xtensa),y)
-KMOD_CONF_ENV += cc_cv_LDFLAGS__Wl___gc_sections=no
-endif
-
 ifeq ($(BR2_PACKAGE_KMOD_TOOLS),y)
 
 # add license info for kmod tools
@@ -53,9 +46,16 @@ KMOD_LICENSE_FILES += COPYING
 # take precedence over busybox implementation
 KMOD_DEPENDENCIES += $(if $(BR2_PACKAGE_BUSYBOX),busybox)
 
+# /sbin is really /usr/sbin with merged /usr, so adjust relative symlink
+ifeq ($(BR2_ROOTFS_MERGED_USR),y)
+KMOD_BIN_PATH = ../bin/kmod
+else
+KMOD_BIN_PATH = ../usr/bin/kmod
+endif
+
 define KMOD_INSTALL_TOOLS
 	for i in depmod insmod lsmod modinfo modprobe rmmod; do \
-		ln -sf ../usr/bin/kmod $(TARGET_DIR)/sbin/$$i; \
+		ln -sf $(KMOD_BIN_PATH) $(TARGET_DIR)/sbin/$$i; \
 	done
 endef
 

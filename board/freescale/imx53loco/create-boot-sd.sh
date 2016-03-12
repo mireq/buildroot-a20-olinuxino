@@ -1,1 +1,1 @@
-../imx6sabresd/create-boot-sd.sh
+../create-boot-sd.sh

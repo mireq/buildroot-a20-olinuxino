@@ -8,6 +8,12 @@ config BR2_LINUX_KERNEL
 
 if BR2_LINUX_KERNEL
 
+# Packages that need to have a kernel with support for loadable modules,
+# but do not use the kernel-modules infrastructure, should select that
+# option.
+config BR2_LINUX_NEEDS_MODULES
+	bool
+
 #
 # Version selection. We provide the choice between:
 #
@@ -21,18 +27,7 @@ choice
 	prompt "Kernel version"
 
 config BR2_LINUX_KERNEL_LATEST_VERSION
-	bool "3.18"
-
-config BR2_LINUX_KERNEL_SAME_AS_HEADERS
-	bool "Same as toolchain kernel headers"
-	depends on BR2_TOOLCHAIN_BUILDROOT
-	help
-	  This option will re-use the same kernel sources as the one
-	  that have been used for the kernel headers of the
-	  cross-compiling toolchain. Having the same version for the
-	  kernel running on the system and for the kernel headers is
-	  not a requirement, but using the same version allows to
-	  download only one tarball of the kernel sources.
+	bool "4.4.5"
 
 config BR2_LINUX_KERNEL_CUSTOM_VERSION
 	bool "Custom version"
@@ -48,8 +43,13 @@ config BR2_LINUX_KERNEL_CUSTOM_VERSION
 config BR2_LINUX_KERNEL_CUSTOM_TARBALL
 	bool "Custom tarball"
 	help
-	  This option allows to specify the http or ftp location of a
-	  specific kernel source tarball
+	  This option allows to specify a URL pointing to a kernel source
+	  tarball. This URL can use any protocol recognized by Buildroot,
+	  like http://, ftp://, file:// or scp://.
+
+	  When pointing to a local tarball using file://, you may want to
+	  use a make variable like $(TOPDIR) to reference the root of the
+	  Buildroot tree.
 
 config BR2_LINUX_KERNEL_CUSTOM_GIT
 	bool "Custom Git repository"
@@ -104,8 +104,7 @@ config BR2_LINUX_KERNEL_CUSTOM_LOCAL_PATH
 
 config BR2_LINUX_KERNEL_VERSION
 	string
-	default "3.18" if BR2_LINUX_KERNEL_LATEST_VERSION
-	default BR2_DEFAULT_KERNEL_HEADERS if BR2_LINUX_KERNEL_SAME_AS_HEADERS
+	default "4.4.5" if BR2_LINUX_KERNEL_LATEST_VERSION
 	default BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE \
 		if BR2_LINUX_KERNEL_CUSTOM_VERSION
 	default "custom" if BR2_LINUX_KERNEL_CUSTOM_TARBALL
@@ -119,11 +118,12 @@ config BR2_LINUX_KERNEL_VERSION
 
 config BR2_LINUX_KERNEL_PATCH
 	string "Custom kernel patches"
+	depends on !BR2_LINUX_KERNEL_CUSTOM_LOCAL
 	help
 	  A space-separated list of patches to apply to the
 	  kernel. Each patch can be described as an URL, a local file
 	  path, or a directory. In the case of a directory, all files
-	  matching linux-*.patch in the directory will be applied.
+	  matching *.patch in the directory will be applied.
 
 #
 # Configuration selection
@@ -134,10 +134,10 @@ choice
 	default BR2_LINUX_KERNEL_USE_DEFCONFIG
 
 config BR2_LINUX_KERNEL_USE_DEFCONFIG
-	bool "Using a defconfig"
+	bool "Using an in-tree defconfig file"
 
 config BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG
-	bool "Using a custom config file"
+	bool "Using a custom (def)config file"
 
 endchoice
 
@@ -155,6 +155,15 @@ config BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE
 	help
 	  Path to the kernel configuration file
 
+	  Note: this can be a defconfig file or a complete .config file,
+	  which can later be saved back with make linux-update-(def)config.
+
+config BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES
+	string "Additional configuration fragment files"
+	help
+	  A space-separated list of kernel configuration fragment files,
+	  that will be merged to the main kernel configuration file.
+
 #
 # Binary format
 #
@@ -168,8 +177,9 @@ choice
 config BR2_LINUX_KERNEL_UIMAGE
 	bool "uImage"
 	depends on BR2_arc || BR2_arm || BR2_armeb || BR2_bfin || \
-		   BR2_powerpc || BR2_avr32 || BR2_sh || BR2_sh64 || \
-		   BR2_mips || BR2_mipsel || BR2_mips64 || BR2_mips64el
+		   BR2_powerpc || BR2_powerpc64 || BR2_powerpc64le || \
+		   BR2_sh || BR2_sh64 || BR2_mips || BR2_mipsel || \
+		   BR2_mips64 || BR2_mips64el
 	select BR2_LINUX_KERNEL_UBOOT_IMAGE
 
 config BR2_LINUX_KERNEL_APPENDED_UIMAGE
@@ -188,6 +198,10 @@ config BR2_LINUX_KERNEL_ZIMAGE
 	depends on BR2_arm || BR2_armeb || BR2_powerpc || \
 		   BR2_powerpc64 || BR2_powerpc64le || BR2_sparc || \
 		   BR2_sh || BR2_sh64 || BR2_xtensa
+
+config BR2_LINUX_KERNEL_ZIMAGE_EPAPR
+	bool "zImage.epapr"
+	depends on BR2_powerpc64 || BR2_powerpc64le
 
 config BR2_LINUX_KERNEL_APPENDED_ZIMAGE
 	bool "zImage with appended DT"
@@ -209,6 +223,10 @@ config BR2_LINUX_KERNEL_SIMPLEIMAGE
 	select BR2_LINUX_KERNEL_DTS_SUPPORT
 	select BR2_LINUX_KERNEL_DTB_IS_SELF_BUILT
 
+config BR2_LINUX_KERNEL_IMAGE
+	bool "Image"
+	depends on BR2_aarch64
+
 config BR2_LINUX_KERNEL_LINUX_BIN
 	bool "linux.bin"
 	depends on BR2_microblaze
@@ -225,6 +243,10 @@ config BR2_LINUX_KERNEL_VMLINUZ
 	bool "vmlinuz"
 	depends on BR2_mips || BR2_mipsel
 
+config BR2_LINUX_KERNEL_VMLINUZ_BIN
+	bool "vmlinuz.bin"
+	depends on BR2_mips || BR2_mipsel
+
 config BR2_LINUX_KERNEL_IMAGE_TARGET_CUSTOM
 	bool "custom target"
 	help
@@ -235,6 +257,34 @@ config BR2_LINUX_KERNEL_IMAGE_TARGET_CUSTOM
 
 	  Select this option and specify the make target in "Kernel
 	  image target name".
+
+endchoice
+
+#
+# Kernel compression format
+#
+
+choice
+	prompt "Kernel compression format"
+	help
+	  This selection will just ensure that the correct host tools are build.
+	  The actual compression for the kernel should be selected in the
+	  kernel configuration menu.
+
+config BR2_LINUX_KERNEL_GZIP
+	bool "gzip compression"
+
+config BR2_LINUX_KERNEL_LZ4
+	bool "lz4 compression"
+
+config BR2_LINUX_KERNEL_LZMA
+	bool "lzma compression"
+
+config BR2_LINUX_KERNEL_LZO
+	bool "lzo compression"
+
+config BR2_LINUX_KERNEL_XZ
+	bool "xz compression"
 
 endchoice
 
@@ -269,22 +319,22 @@ config BR2_LINUX_KERNEL_UIMAGE_LOADADDR
 	  If unsure, let this option empty.
 
 config BR2_LINUX_KERNEL_DTS_SUPPORT
-	bool "Device tree support"
+	bool "Build a Device Tree Blob (DTB)"
 	help
-	  Compile a device tree source into a device tree blob.
-	  Select the dts file to compile in the options below.
+	  Compile one or more device tree sources into device tree blobs.
+	  Select the dts files to compile in the options below.
 
 if BR2_LINUX_KERNEL_DTS_SUPPORT
 
 # We have mainly three cases when it comes to device tree support:
 #   1) We don't want any support at all. Then the ..DTS_SUPPORT
 #      variable won't be set
-#   2) We want device tree support, so we need the user to enter
-#      the device tree name or the the path to the custom device
-#      he uses, but the kernel abstracts this from us and only
-#      build an image that looks like a regular kernel image. In
-#      this case, we only need to derive the kernel image name from
-#      the given device tree name, and all the rest is as usual
+#   2) We want device tree support, so we need the user to enter the
+#      device tree name or the path to the custom device he uses, but
+#      the kernel abstracts this from us and only build an image that
+#      looks like a regular kernel image. In this case, we only need
+#      to derive the kernel image name from the given device tree
+#      name, and all the rest is as usual
 #   3) We want device tree support, but the kernel requires us to
 #      build the device tree blob separately. In this case, some
 #      more logic will be needed.
@@ -347,6 +397,9 @@ config BR2_LINUX_KERNEL_INSTALL_TARGET
 
 # Linux extensions
 source "linux/Config.ext.in"
+
+# Linux tools
+source "linux/Config.tools.in"
 
 endif # BR2_LINUX_KERNEL
 

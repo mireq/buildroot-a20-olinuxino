@@ -4,13 +4,16 @@
 #
 ################################################################################
 
-BLUEZ5_UTILS_VERSION = 5.25
+BLUEZ5_UTILS_VERSION = 5.37
 BLUEZ5_UTILS_SOURCE = bluez-$(BLUEZ5_UTILS_VERSION).tar.xz
 BLUEZ5_UTILS_SITE = $(BR2_KERNEL_MIRROR)/linux/bluetooth
 BLUEZ5_UTILS_INSTALL_STAGING = YES
 BLUEZ5_UTILS_DEPENDENCIES = dbus libglib2
-BLUEZ5_UTILS_LICENSE = GPLv2+ LGPLv2.1+
+BLUEZ5_UTILS_LICENSE = GPLv2+, LGPLv2.1+
 BLUEZ5_UTILS_LICENSE_FILES = COPYING COPYING.LIB
+
+# 0001-Link-mcaptest-with-lrt.patch
+BLUEZ5_UTILS_AUTORECONF = YES
 
 BLUEZ5_UTILS_CONF_OPTS = 	\
 	--enable-tools 		\
@@ -36,6 +39,13 @@ ifeq ($(BR2_PACKAGE_BLUEZ5_UTILS_EXPERIMENTAL),y)
 BLUEZ5_UTILS_CONF_OPTS += --enable-experimental
 else
 BLUEZ5_UTILS_CONF_OPTS += --disable-experimental
+endif
+
+# enable sixaxis plugin
+ifeq ($(BR2_PACKAGE_BLUEZ5_PLUGINS_SIXAXIS),y)
+BLUEZ5_UTILS_CONF_OPTS += --enable-sixaxis
+else
+BLUEZ5_UTILS_CONF_OPTS += --disable-sixaxis
 endif
 
 # install gatttool (For some reason upstream choose not to do it by default)

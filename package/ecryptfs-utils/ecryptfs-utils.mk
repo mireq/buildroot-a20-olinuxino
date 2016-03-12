@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-ECRYPTFS_UTILS_VERSION = 104
+ECRYPTFS_UTILS_VERSION = 109
 ECRYPTFS_UTILS_SOURCE = ecryptfs-utils_$(ECRYPTFS_UTILS_VERSION).orig.tar.gz
 ECRYPTFS_UTILS_SITE = https://launchpad.net/ecryptfs/trunk/$(ECRYPTFS_UTILS_VERSION)/+download
 ECRYPTFS_UTILS_LICENSE = GPLv2+
@@ -19,10 +19,10 @@ ECRYPTFS_UTILS_CONF_ENV = \
 	NSS_LIBS="-lnss3"
 
 ifeq ($(BR2_PACKAGE_OPENSSL),y)
-	ECRYPTFS_UTILS_CONF_OPTS += --enable-openssl
-	ECRYPTFS_UTILS_DEPENDENCIES += openssl
+ECRYPTFS_UTILS_CONF_OPTS += --enable-openssl
+ECRYPTFS_UTILS_DEPENDENCIES += openssl
 else
-	ECRYPTFS_UTILS_CONF_OPTS += --disable-openssl
+ECRYPTFS_UTILS_CONF_OPTS += --disable-openssl
 endif
 
 $(eval $(autotools-package))

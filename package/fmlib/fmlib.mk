@@ -6,7 +6,7 @@
 
 FMLIB_VERSION = fsl-sdk-v1.5-rc3
 FMLIB_SITE = git://git.freescale.com/ppc/sdk/fmlib.git
-FMLIB_LICENSE = BSD-3c GPLv2+
+FMLIB_LICENSE = BSD-3c, GPLv2+
 FMLIB_LICENSE_FILES = COPYING
 FMLIB_DEPENDENCIES = linux
 FMLIB_INSTALL_STAGING = YES
@@ -22,7 +22,7 @@ FMLIB_MAKE_OPTS = \
 	PREFIX="$(STAGING_DIR)/usr"
 
 ifeq ($(BR2_powerpc_e500mc),y)
-	FMLIB_ARCHTYPE = ppce500mc
+FMLIB_ARCHTYPE = ppce500mc
 endif
 
 define FMLIB_BUILD_CMDS
