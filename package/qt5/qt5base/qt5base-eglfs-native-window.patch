@@ -1,11 +1,10 @@
---- old/src/plugins/platforms/eglfs/qeglfshooks_stub.cpp	2014-12-21 10:33:37.084268835 +0100
-+++ new/src/plugins/platforms/eglfs/qeglfshooks_stub.cpp	2014-12-21 10:35:41.820259749 +0100
-@@ -161,7 +161,12 @@
+--- old/src/plugins/platforms/eglfs/qeglfsdeviceintegration.cpp	2016-03-12 20:31:15.565690286 +0100
++++ new/src/plugins/platforms/eglfs/qeglfsdeviceintegration.cpp	2016-03-12 20:31:39.594690857 +0100
+@@ -260,7 +260,11 @@
      Q_UNUSED(platformWindow);
      Q_UNUSED(size);
      Q_UNUSED(format);
 -    return 0;
-+
 +    static struct mali_native_window native_window = {
 +        .width = (short unsigned int)size.width(),
 +        .height = (short unsigned int)size.height(),
@@ -13,4 +12,4 @@
 +    return &native_window;
  }
  
- void QEglFSHooks::destroyNativeWindow(EGLNativeWindowType window)
+ EGLNativeWindowType QEGLDeviceIntegration::createNativeOffscreenWindow(const QSurfaceFormat &format)

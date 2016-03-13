@@ -1,5 +1,5 @@
---- old/src/platformsupport/eglconvenience/qeglplatformintegration.cpp	2014-12-21 12:08:06.110223752 +0100
-+++ new/src/platformsupport/eglconvenience/qeglplatformintegration.cpp	2014-12-21 12:08:12.396856361 +0100
+--- old/src/platformsupport/eglconvenience/qeglplatformintegration.cpp	2016-03-12 20:54:52.338723958 +0100
++++ new/src/platformsupport/eglconvenience/qeglplatformintegration.cpp	2016-03-12 20:55:37.081725021 +0100
 @@ -106,10 +106,29 @@
      if (m_display == EGL_NO_DISPLAY)
          qFatal("Could not open egl display");
@@ -27,6 +27,6 @@
 +        }
 +    }
 +
-     m_screen = createScreen();
-     screenAdded(m_screen);
+     m_inputContext = QPlatformInputContextFactory::create();
  
+     m_vtHandler.reset(new QFbVtHandler);
