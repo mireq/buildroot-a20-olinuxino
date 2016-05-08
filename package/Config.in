@@ -1529,6 +1529,7 @@ endif
 	source "package/xl2tp/Config.in"
 	source "package/xtables-addons/Config.in"
 	source "package/znc/Config.in"
+	source "package/uwsgi/Config.in"
 
 endmenu
 
