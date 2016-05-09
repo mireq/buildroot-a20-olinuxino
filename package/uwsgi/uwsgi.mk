@@ -6,7 +6,7 @@
 
 UWSGI_VERSION = 1.4.10
 UWSGI_SOURCE = uwsgi-$(UWSGI_VERSION).tar.gz
-UWSGI_SITE = http://projects.unbit.it/downloads/
+UWSGI_SITE = http://projects.unbit.it/downloads
 UWSGI_INSTALL_STAGING = YES
 UWSGI_LICENSE = GPL
 UWSGI_LICENSE_FILES = COPYING
