@@ -13,7 +13,7 @@ define PYTHON_REPORTLAB_BUILD_CMDS
 	(cd $(@D); \
 		PYTHONXCPREFIX="$(STAGING_DIR)/usr/" \
 		LDFLAGS="-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib" \
-	$(HOST_DIR)/usr/bin/python setup.py build -x)
+	$(HOST_DIR)/usr/bin/python setup.py build)
 endef
 
 define PYTHON_REPORTLAB_INSTALL_TARGET_CMDS
