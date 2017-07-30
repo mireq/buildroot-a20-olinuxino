@@ -4,13 +4,11 @@
 #
 ################################################################################
 
-LIBDRM_VERSION = 2.4.67
+LIBDRM_VERSION = 2.4.82
 LIBDRM_SOURCE = libdrm-$(LIBDRM_VERSION).tar.bz2
 LIBDRM_SITE = http://dri.freedesktop.org/libdrm
 LIBDRM_LICENSE = MIT
-
 LIBDRM_INSTALL_STAGING = YES
-
 LIBDRM_DEPENDENCIES = \
 	libpthread-stubs \
 	host-pkgconf
@@ -21,9 +19,16 @@ LIBDRM_CONF_OPTS = \
 
 LIBDRM_CONF_ENV = ac_cv_prog_cc_c99='-std=gnu99'
 
+ifeq ($(BR2_PACKAGE_LIBATOMIC_OPS),y)
+LIBDRM_DEPENDENCIES += libatomic_ops
+ifeq ($(BR2_sparc_v8)$(BR2_sparc_leon3),y)
+LIBDRM_CONF_ENV += CFLAGS="$(TARGET_CFLAGS) -DAO_NO_SPARC_V9"
+endif
+endif
+
 ifeq ($(BR2_PACKAGE_LIBDRM_INTEL),y)
 LIBDRM_CONF_OPTS += --enable-intel
-LIBDRM_DEPENDENCIES += libatomic_ops libpciaccess
+LIBDRM_DEPENDENCIES += libpciaccess
 else
 LIBDRM_CONF_OPTS += --disable-intel
 endif
@@ -58,6 +63,12 @@ else
 LIBDRM_CONF_OPTS += --disable-omap-experimental-api
 endif
 
+ifeq ($(BR2_PACKAGE_LIBDRM_ETNAVIV),y)
+LIBDRM_CONF_OPTS += --enable-etnaviv-experimental-api
+else
+LIBDRM_CONF_OPTS += --disable-etnaviv-experimental-api
+endif
+
 ifeq ($(BR2_PACKAGE_LIBDRM_EXYNOS),y)
 LIBDRM_CONF_OPTS += --enable-exynos-experimental-api
 else
@@ -74,6 +85,12 @@ ifeq ($(BR2_PACKAGE_LIBDRM_TEGRA),y)
 LIBDRM_CONF_OPTS += --enable-tegra-experimental-api
 else
 LIBDRM_CONF_OPTS += --disable-tegra-experimental-api
+endif
+
+ifeq ($(BR2_PACKAGE_LIBDRM_VC4),y)
+LIBDRM_CONF_OPTS += --enable-vc4
+else
+LIBDRM_CONF_OPTS += --disable-vc4
 endif
 
 ifeq ($(BR2_PACKAGE_HAS_UDEV),y)

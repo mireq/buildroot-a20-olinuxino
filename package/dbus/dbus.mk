@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-DBUS_VERSION = 1.10.8
-DBUS_SITE = http://dbus.freedesktop.org/releases/dbus
-DBUS_LICENSE = AFLv2.1, GPLv2+
+DBUS_VERSION = 1.10.22
+DBUS_SITE = https://dbus.freedesktop.org/releases/dbus
+DBUS_LICENSE = AFL-2.1 or GPL-2.0+ (library, tools), GPL-2.0+ (tools)
 DBUS_LICENSE_FILES = COPYING
 DBUS_INSTALL_STAGING = YES
 
@@ -32,7 +32,8 @@ DBUS_CONF_OPTS = \
 	--disable-dnotify \
 	--with-xml=expat \
 	--with-system-socket=/var/run/dbus/system_bus_socket \
-	--with-system-pid-file=/var/run/messagebus.pid
+	--with-system-pid-file=/var/run/messagebus.pid \
+	--with-init-scripts=none
 
 ifeq ($(BR2_STATIC_LIBS),y)
 DBUS_CONF_OPTS += LIBS='-pthread'
@@ -81,7 +82,7 @@ define DBUS_REMOVE_VAR_LIB_DBUS
 	rm -rf $(TARGET_DIR)/var/lib/dbus
 endef
 
-DBUS_POST_BUILD_HOOKS += DBUS_REMOVE_VAR_LIB_DBUS
+DBUS_PRE_INSTALL_TARGET_HOOKS += DBUS_REMOVE_VAR_LIB_DBUS
 
 define DBUS_REMOVE_DEVFILES
 	rm -rf $(TARGET_DIR)/usr/lib/dbus-1.0
@@ -120,7 +121,7 @@ HOST_DBUS_CONF_OPTS = \
 DBUS_HOST_INTROSPECT = $(HOST_DBUS_DIR)/introspect.xml
 
 HOST_DBUS_GEN_INTROSPECT = \
-	$(HOST_DIR)/usr/bin/dbus-daemon --introspect > $(DBUS_HOST_INTROSPECT)
+	$(HOST_DIR)/bin/dbus-daemon --introspect > $(DBUS_HOST_INTROSPECT)
 
 HOST_DBUS_POST_INSTALL_HOOKS += HOST_DBUS_GEN_INTROSPECT
 

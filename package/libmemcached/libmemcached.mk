@@ -15,12 +15,10 @@ LIBMEMCACHED_INSTALL_STAGING = YES
 LIBMEMCACHED_DEPENDENCIES = $(if $(BR2_PACKAGE_LIBEVENT),libevent)
 # For 0001-disable-tests.patch and 0002-disable-sanitizer.patch
 LIBMEMCACHED_AUTORECONF = YES
-LIBMEMCACHED_LICENSE = BSD-3c
+LIBMEMCACHED_LICENSE = BSD-3-Clause
 LIBMEMCACHED_LICENSE_FILES = COPYING
 
-# Help libmemcached to understand that -fPIE and -pie should not be
-# used when linking statically.
-ifeq ($(BR2_STATIC_LIBS),y)
+ifeq ($(BR2_TOOLCHAIN_SUPPORTS_PIE),)
 LIBMEMCACHED_CONF_ENV += \
 	ax_cv_check_cflags__Werror__fPIE=no \
 	ax_cv_check_cflags__Werror__pie=no \

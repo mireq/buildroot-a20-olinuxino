@@ -4,14 +4,20 @@
 #
 ################################################################################
 
-MPLAYER_VERSION = 1.2
+MPLAYER_VERSION = 1.3.0
 MPLAYER_SOURCE = MPlayer-$(MPLAYER_VERSION).tar.xz
 MPLAYER_SITE = http://www.mplayerhq.hu/MPlayer/releases
 MPLAYER_DEPENDENCIES = host-pkgconf
-MPLAYER_LICENSE = GPLv2
+MPLAYER_LICENSE = GPL-2.0
 MPLAYER_LICENSE_FILES = LICENSE Copyright
 MPLAYER_CFLAGS = $(TARGET_CFLAGS)
 MPLAYER_LDFLAGS = $(TARGET_LDFLAGS)
+
+# Adding $(STAGING_DIR)/usr/include in the header path is normally not
+# needed. Except that mplayer's configure script has a completely
+# brain-damaged way of looking for X11/Xlib.h (it parses extra-cflags
+# for -I options).
+MPLAYER_CFLAGS += -I$(STAGING_DIR)/usr/include
 
 # mplayer needs pcm+mixer support, but configure fails to check for it
 ifeq ($(BR2_PACKAGE_ALSA_LIB)$(BR2_PACKAGE_ALSA_LIB_MIXER)$(BR2_PACKAGE_ALSA_LIB_PCM),yyy)
@@ -50,7 +56,7 @@ MPLAYER_CONF_OPTS += --disable-sdl
 endif
 
 ifeq ($(BR2_PACKAGE_FREETYPE),y)
-MPLAYER_CONF_OPTS +=  \
+MPLAYER_CONF_OPTS += \
 	--enable-freetype \
 	--with-freetype-config=$(STAGING_DIR)/usr/bin/freetype-config
 MPLAYER_DEPENDENCIES += freetype
@@ -98,9 +104,11 @@ else
 MPLAYER_CONF_OPTS += --disable-termcap
 endif
 
-ifeq ($(BR2_PACKAGE_SAMBA_SMBCLIENT),y)
+# mplayer doesn't pick up libsmbclient cflags
+ifeq ($(BR2_PACKAGE_SAMBA4),y)
+MPLAYER_CFLAGS += `$(PKG_CONFIG_HOST_BINARY) --cflags smbclient`
 MPLAYER_CONF_OPTS += --enable-smb
-MPLAYER_DEPENDENCIES += samba
+MPLAYER_DEPENDENCIES += samba4
 else
 MPLAYER_CONF_OPTS += --disable-smb
 endif
@@ -120,16 +128,16 @@ MPLAYER_CONF_OPTS += --disable-libcdio
 # We intentionally don't pass --enable-dvdread, to let the
 # autodetection find which library to link with.
 ifeq ($(BR2_PACKAGE_LIBDVDREAD),y)
-MPLAYER_CONF_OPTS +=  \
-	--with-dvdread-config=$(STAGING_DIR)/usr/bin/dvdread-config
+MPLAYER_CONF_OPTS += \
+	--with-dvdread-config="$(PKG_CONFIG_HOST_BINARY) dvdread"
 MPLAYER_DEPENDENCIES += libdvdread
 endif
 
 # We intentionally don't pass --enable-dvdnav to let the autodetection
 # find which library to link with.
 ifeq ($(BR2_PACKAGE_LIBDVDNAV),y)
-MPLAYER_CONF_OPTS +=  \
-	--with-dvdnav-config=$(STAGING_DIR)/usr/bin/dvdnav-config
+MPLAYER_CONF_OPTS += \
+	--with-dvdnav-config="$(PKG_CONFIG_HOST_BINARY) dvdnav"
 MPLAYER_DEPENDENCIES += libdvdnav
 endif
 
@@ -172,6 +180,14 @@ MPLAYER_DEPENDENCIES += libmpeg2
 MPLAYER_CONF_OPTS += --disable-libmpeg2-internal
 endif
 
+# We intentionally don't pass --enable-mpg123, to let the
+# autodetection find which library to link with.
+ifeq ($(BR2_PACKAGE_MPG123),y)
+MPLAYER_DEPENDENCIES += mpg123
+else
+MPLAYER_CONF_OPTS += --disable-mpg123
+endif
+
 ifeq ($(BR2_PACKAGE_TREMOR),y)
 MPLAYER_DEPENDENCIES += tremor
 MPLAYER_CONF_OPTS += --enable-tremor
@@ -206,6 +222,12 @@ MPLAYER_DEPENDENCIES += giflib
 MPLAYER_CONF_OPTS += --enable-gif
 else
 MPLAYER_CONF_OPTS += --disable-gif
+endif
+
+# We intentionally don't pass --enable-pulse, to let the
+# autodetection find which library to link with.
+ifeq ($(BR2_PACKAGE_PULSEAUDIO),y)
+MPLAYER_DEPENDENCIES += pulseaudio
 endif
 
 # We intentionally don't pass --enable-librtmp to let autodetection
@@ -252,6 +274,10 @@ ifeq ($(BR2_ARM_CPU_ARMV6)$(BR2_ARM_CPU_ARMV7A),y)
 MPLAYER_CONF_OPTS += --enable-armv6
 endif
 
+ifeq ($(BR2_aarch64),y)
+MPLAYER_CONF_OPTS += --enable-armv8
+endif
+
 ifeq ($(BR2_ARM_SOFT_FLOAT),)
 ifeq ($(BR2_ARM_CPU_HAS_NEON),y)
 MPLAYER_CONF_OPTS += --enable-neon
@@ -259,17 +285,76 @@ MPLAYER_CFLAGS += -mfpu=neon
 endif
 endif
 
+define MPLAYER_DISABLE_INLINE_ASM
+	$(SED) 's,#define HAVE_INLINE_ASM 1,#define HAVE_INLINE_ASM 0,g' \
+		$(@D)/config.h
+	$(SED) 's,#define HAVE_MMX_INLINE 1,#define HAVE_MMX_INLINE 0,g' \
+		$(@D)/config.h
+	$(SED) 's,#define HAVE_MMX_EXTERNAL 1,#define HAVE_MMX_EXTERNAL 0,g' \
+		$(@D)/config.h
+endef
+
 ifeq ($(BR2_i386),y)
-# inline asm breaks with "can't find a register in class 'GENERAL_REGS'"
-# inless we free up ebp
-MPLAYER_CFLAGS += -fomit-frame-pointer
+MPLAYER_POST_CONFIGURE_HOOKS += MPLAYER_DISABLE_INLINE_ASM
 endif
 
 ifeq ($(BR2_X86_CPU_HAS_MMX),y)
-MPLAYER_CONF_OPTS += --yasm=$(HOST_DIR)/usr/bin/yasm
+MPLAYER_CONF_OPTS += \
+	--enable-mmx \
+	--yasm=$(HOST_DIR)/bin/yasm
 MPLAYER_DEPENDENCIES += host-yasm
 else
-MPLAYER_CONF_OPTS += --yasm=''
+MPLAYER_CONF_OPTS += \
+	--disable-mmx \
+	--yasm=''
+endif
+
+ifeq ($(BR2_X86_CPU_HAS_SSE),y)
+MPLAYER_CONF_OPTS += --enable-mmxext --enable-sse
+else
+MPLAYER_CONF_OPTS += --disable-mmxext --disable-sse
+endif
+
+ifeq ($(BR2_X86_CPU_HAS_SSE2),y)
+MPLAYER_CONF_OPTS += --enable-sse2
+else
+MPLAYER_CONF_OPTS += --disable-sse2
+endif
+
+ifeq ($(BR2_X86_CPU_HAS_SSE3),y)
+MPLAYER_CONF_OPTS += --enable-sse3
+else
+MPLAYER_CONF_OPTS += --disable-sse3
+endif
+
+ifeq ($(BR2_X86_CPU_HAS_SSSE3),y)
+MPLAYER_CONF_OPTS += --enable-ssse3
+else
+MPLAYER_CONF_OPTS += --disable-ssse3
+endif
+
+ifeq ($(BR2_X86_CPU_HAS_SSE4),y)
+MPLAYER_CONF_OPTS += --enable-sse4
+else
+MPLAYER_CONF_OPTS += --disable-sse4
+endif
+
+ifeq ($(BR2_X86_CPU_HAS_SSE42),y)
+MPLAYER_CONF_OPTS += --enable-sse42
+else
+MPLAYER_CONF_OPTS += --disable-sse42
+endif
+
+ifeq ($(BR2_X86_CPU_HAS_AVX),y)
+MPLAYER_CONF_OPTS += --enable-avx
+else
+MPLAYER_CONF_OPTS += --disable-avx
+endif
+
+ifeq ($(BR2_X86_CPU_HAS_AVX2),y)
+MPLAYER_CONF_OPTS += --enable-avx2
+else
+MPLAYER_CONF_OPTS += --disable-avx2
 endif
 
 define MPLAYER_CONFIGURE_CMDS
@@ -296,11 +381,11 @@ define MPLAYER_CONFIGURE_CMDS
 endef
 
 define MPLAYER_BUILD_CMDS
-	$(MAKE) -C $(@D)
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)
 endef
 
 define MPLAYER_INSTALL_TARGET_CMDS
-	$(MAKE) DESTDIR=$(TARGET_DIR) -C $(@D) install
+	$(TARGET_MAKE_ENV) $(MAKE) DESTDIR=$(TARGET_DIR) -C $(@D) install
 endef
 
 $(eval $(generic-package))

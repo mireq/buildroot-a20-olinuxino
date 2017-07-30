@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-EMLOG_VERSION = bd32494ad757c3d37469877aaf99ced3ee6ca3f8
+EMLOG_VERSION = emlog-0.60
 EMLOG_SITE = $(call github,nicupavel,emlog,$(EMLOG_VERSION))
-EMLOG_LICENSE = GPLv2
+EMLOG_LICENSE = GPL-2.0
 EMLOG_LICENSE_FILES = COPYING
 
 define EMLOG_BUILD_CMDS

@@ -20,6 +20,15 @@ config BR2_PACKAGE_POPPLER_QT
 	help
 	  Build Qt support into the Poppler library
 
+config BR2_PACKAGE_POPPLER_QT5
+	bool "Qt5 support"
+	depends on BR2_PACKAGE_QT5
+	select BR2_PACKAGE_QT5BASE_GUI
+	select BR2_PACKAGE_QT5BASE_WIDGETS
+	select BR2_PACKAGE_QT5BASE_XML
+	help
+	  Build Qt support into the Poppler library
+
 endif
 
 comment "poppler needs a toolchain w/ C++, threads"

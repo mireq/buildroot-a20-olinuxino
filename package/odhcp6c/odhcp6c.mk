@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-ODHCP6C_VERSION = dc186d6d2b0dd4ad23ca5fc69c00e81f796ff6d9
+ODHCP6C_VERSION = 7533a6243dc3ac5a747cf6ccbc4d0539dafd3e07
 ODHCP6C_SITE = $(call github,sbyx,odhcp6c,$(ODHCP6C_VERSION))
-ODHCP6C_LICENSE = GPLv2
+ODHCP6C_LICENSE = GPL-2.0
 ODHCP6C_LICENSE_FILES = COPYING
 
 define ODHCP6C_INSTALL_SCRIPT

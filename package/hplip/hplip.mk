@@ -4,11 +4,11 @@
 #
 ################################################################################
 
-HPLIP_VERSION = 3.15.11
+HPLIP_VERSION = 3.16.11
 HPLIP_SITE = http://downloads.sourceforge.net/hplip/hplip
 HPLIP_AUTORECONF = YES
 HPLIP_DEPENDENCIES = cups libusb jpeg host-pkgconf
-HPLIP_LICENSE = GPLv2 BSD-3c MIT
+HPLIP_LICENSE = GPL-2.0, BSD-3-Clause, MIT
 HPLIP_LICENSE_FILES = COPYING
 
 HPLIP_CONF_OPTS = \
@@ -26,6 +26,9 @@ HPLIP_CONF_OPTS = \
 	--disable-foomatic-rip-hplip-install \
 	--enable-new-hpcups \
 	--enable-lite-build
+
+# build system does not support cups-config
+HPLIP_CONF_ENV = LIBS=`$(STAGING_DIR)/usr/bin/cups-config --libs`
 
 ifeq ($(BR2_PACKAGE_DBUS),y)
 HPLIP_CONF_OPTS += --enable-dbus-build

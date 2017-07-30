@@ -1,3 +1,2 @@
-# Locally calculated after checking pgp signature:
-#   ftp://oss.sgi.com/projects/xfs/cmd_tars/xfsprogs-4.3.0.tar.gz.sig
-sha256 3e570ad51153e4be3792f42b2c805ddbd46b55d166eba3102ec87d5006d4cb5c  xfsprogs-4.3.0.tar.gz
+# From https://www.kernel.org/pub/linux/utils/fs/xfs/xfsprogs/sha256sums.asc
+sha256 c3a6d87b564d7738243c507df82276bed982265e345363a95f2c764e8a5f5bb2  xfsprogs-4.11.0.tar.xz

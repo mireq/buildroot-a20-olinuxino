@@ -7,7 +7,7 @@
 SDL_VERSION = 1.2.15
 SDL_SOURCE = SDL-$(SDL_VERSION).tar.gz
 SDL_SITE = http://www.libsdl.org/release
-SDL_LICENSE = LGPLv2.1+
+SDL_LICENSE = LGPL-2.1+
 SDL_LICENSE_FILES = COPYING
 SDL_INSTALL_STAGING = YES
 
@@ -80,6 +80,7 @@ SDL_DEPENDENCIES += mesa3d
 endif
 
 SDL_CONF_OPTS += \
+	--disable-rpath \
 	--enable-pulseaudio=no \
 	--disable-arts \
 	--disable-esd \
@@ -95,14 +96,6 @@ HOST_SDL_CONF_OPTS += \
 	--disable-video-ps3
 
 SDL_CONFIG_SCRIPTS = sdl-config
-
-# Remove the -Wl,-rpath option.
-define SDL_FIXUP_SDL_CONFIG
-	$(SED) 's%-Wl,-rpath,\$${libdir}%%' \
-		$(STAGING_DIR)/usr/bin/sdl-config
-endef
-
-SDL_POST_INSTALL_STAGING_HOOKS += SDL_FIXUP_SDL_CONFIG
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

@@ -4,9 +4,11 @@
 #
 ################################################################################
 
-NANO_VERSION = 2.5.3
-NANO_SITE = $(BR2_GNU_MIRROR)/nano
-NANO_LICENSE = GPLv3+
+NANO_VERSION_MAJOR = 2.8
+NANO_VERSION = $(NANO_VERSION_MAJOR).4
+NANO_SITE = https://www.nano-editor.org/dist/v$(NANO_VERSION_MAJOR)
+NANO_SOURCE = nano-$(NANO_VERSION).tar.xz
+NANO_LICENSE = GPL-3.0+
 NANO_LICENSE_FILES = COPYING
 NANO_CONF_OPTS = \
 	--without-slang \

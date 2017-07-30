@@ -4,16 +4,19 @@
 #
 ################################################################################
 
-SAMBA4_VERSION = 4.3.6
-SAMBA4_SITE = http://ftp.samba.org/pub/samba/stable
+SAMBA4_VERSION = 4.5.12
+SAMBA4_SITE = https://download.samba.org/pub/samba/stable
 SAMBA4_SOURCE = samba-$(SAMBA4_VERSION).tar.gz
 SAMBA4_INSTALL_STAGING = YES
-SAMBA4_LICENSE = GPLv3+
+SAMBA4_LICENSE = GPL-3.0+
 SAMBA4_LICENSE_FILES = COPYING
-SAMBA4_DEPENDENCIES = host-e2fsprogs host-heimdal e2fsprogs popt python zlib \
-	$(if $(BR2_PACKAGE_LIBBSD),libbsd) \
+SAMBA4_DEPENDENCIES = \
+	host-e2fsprogs host-heimdal host-python \
+	e2fsprogs popt python zlib \
+	$(if $(BR2_PACKAGE_LIBAIO),libaio) \
 	$(if $(BR2_PACKAGE_LIBCAP),libcap) \
-	$(if $(BR2_PACKAGE_READLINE),readline)
+	$(if $(BR2_PACKAGE_READLINE),readline) \
+	$(TARGET_NLS_DEPENDENCIES)
 
 ifeq ($(BR2_PACKAGE_ACL),y)
 SAMBA4_CONF_OPTS += --with-acl-support
@@ -30,13 +33,6 @@ else
 SAMBA4_CONF_OPTS += --disable-cups
 endif
 
-ifeq ($(BR2_PACKAGE_LIBAIO),y)
-SAMBA4_CONF_OPTS += --with-aio-support
-SAMBA4_DEPENDENCIES += libaio
-else
-SAMBA4_CONF_OPTS += --without-aio-support
-endif
-
 ifeq ($(BR2_PACKAGE_DBUS)$(BR2_PACKAGE_AVAHI_DAEMON),yy)
 SAMBA4_CONF_OPTS += --enable-avahi
 SAMBA4_DEPENDENCIES += avahi
@@ -51,13 +47,6 @@ else
 SAMBA4_CONF_OPTS += --without-fam
 endif
 
-ifeq ($(BR2_PACKAGE_GETTEXT),y)
-SAMBA4_CONF_OPTS += --with-gettext=$(STAGING_DIR)/usr
-SAMBA4_DEPENDENCIES += gettext
-else
-SAMBA4_CONF_OPTS += --without-gettext
-endif
-
 ifeq ($(BR2_PACKAGE_GNUTLS),y)
 SAMBA4_CONF_OPTS += --enable-gnutls
 SAMBA4_DEPENDENCIES += gnutls
@@ -65,7 +54,7 @@ else
 SAMBA4_CONF_OPTS += --disable-gnutls
 endif
 
-ifeq ($(BR2_PACKAGE_NCURSES_TARGET_FORM)$(BR2_PACKAGE_NCURSES_TARGET_MENU)$(BR2_PACKAGE_NCURSES_TARGET_PANEL),yyy)
+ifeq ($(BR2_PACKAGE_NCURSES),y)
 SAMBA4_CONF_ENV += NCURSES_CONFIG="$(STAGING_DIR)/usr/bin/$(NCURSES_CONFIG_SCRIPTS)"
 SAMBA4_DEPENDENCIES += ncurses
 else
@@ -123,16 +112,6 @@ define SAMBA4_INSTALL_TARGET_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) DESTDIR=$(TARGET_DIR) install
 endef
 
-# Samba just installs .py files so the purge causes problems with some tools
-ifeq ($(BR2_PACKAGE_PYTHON_PYC_ONLY),y)
-define SAMBA4_BUILD_PYC_FILES
-	PYTHONPATH="$(PYTHON_PATH)" \
-		$(HOST_DIR)/usr/bin/python -c "import compileall; \
-		compileall.compile_dir('$(TARGET_DIR)/usr/lib/python$(PYTHON_VERSION_MAJOR)/site-packages/samba')"
-endef
-SAMBA4_POST_INSTALL_TARGET_HOOKS += SAMBA4_BUILD_PYC_FILES
-endif
-
 ifeq ($(BR2_PACKAGE_SAMBA4_AD_DC),)
 SAMBA4_CONF_OPTS += --without-ad-dc
 endif
@@ -170,6 +149,9 @@ define SAMBA4_INSTALL_INIT_SYSTEMD
 		$(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/smb.service
 	ln -sf ../../../../usr/lib/systemd/system/winbind.service \
 		$(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/winbind.service
+	$(INSTALL) -D -m 644 $(@D)/packaging/systemd/samba.conf.tmp \
+		$(TARGET_DIR)/usr/lib/tmpfiles.d/samba.conf
+	printf "d /var/log/samba  755 root root\n" >>$(TARGET_DIR)/usr/lib/tmpfiles.d/samba.conf
 endef
 
 $(eval $(generic-package))

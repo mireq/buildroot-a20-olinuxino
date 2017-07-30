@@ -4,13 +4,14 @@
 #
 ################################################################################
 
-TVHEADEND_VERSION = 1aa0073be39119f5d0d79212e6c83c470904a161
+TVHEADEND_VERSION = 54e63e3f9af8fdc0d23f61f3cda7fa7b246c1732
 TVHEADEND_SITE = $(call github,tvheadend,tvheadend,$(TVHEADEND_VERSION))
-TVHEADEND_LICENSE = GPLv3+
+TVHEADEND_LICENSE = GPL-3.0+
 TVHEADEND_LICENSE_FILES = LICENSE.md
 TVHEADEND_DEPENDENCIES = \
 	host-gettext \
 	host-pkgconf \
+	host-pngquant \
 	$(if $(BR2_PACKAGE_PYTHON3),host-python3,host-python) \
 	openssl
 
@@ -56,6 +57,13 @@ TVHEADEND_DEPENDENCIES += liburiparser
 TVHEADEND_CFLAGS += $(if $(BR2_USE_WCHAR),,-DURI_NO_UNICODE)
 endif
 
+ifeq ($(BR2_PACKAGE_PCRE),y)
+TVHEADEND_DEPENDENCIES += pcre
+TVHEADEND_CONF_OPTS += --enable-pcre
+else
+TVHEADEND_CONF_OPTS += --disable-pcre
+endif
+
 TVHEADEND_DEPENDENCIES += dtv-scan-tables
 
 # The tvheadend build system expects the transponder data to be present inside
@@ -69,29 +77,37 @@ endef
 TVHEADEND_PRE_CONFIGURE_HOOKS += TVHEADEND_INSTALL_DTV_SCAN_TABLES
 
 define TVHEADEND_CONFIGURE_CMDS
-	(cd $(@D);						\
-		$(TARGET_CONFIGURE_OPTS)			\
-		$(TARGET_CONFIGURE_ARGS)			\
-		CFLAGS="$(TVHEADEND_CFLAGS)"			\
-		./configure					\
-			--prefix=/usr				\
-			--arch="$(ARCH)"			\
-			--cpu="$(BR2_GCC_TARGET_CPU)"		\
-			--python="$(HOST_DIR)/usr/bin/python"	\
-			--enable-dvbscan			\
-			--enable-bundle				\
-			--disable-libffmpeg_static		\
-			--disable-hdhomerun_static		\
-			$(TVHEADEND_CONF_OPTS)			\
+	(cd $(@D); \
+		$(TARGET_CONFIGURE_OPTS) \
+		$(TARGET_CONFIGURE_ARGS) \
+		CFLAGS="$(TVHEADEND_CFLAGS)" \
+		./configure \
+			--prefix=/usr \
+			--arch="$(ARCH)" \
+			--cpu="$(BR2_GCC_TARGET_CPU)" \
+			--nowerror \
+			--python="$(HOST_DIR)/bin/python" \
+			--enable-dvbscan \
+			--enable-bundle \
+			--enable-pngquant \
+			--disable-ffmpeg_static \
+			--disable-hdhomerun_static \
+			$(TVHEADEND_CONF_OPTS) \
 	)
 endef
 
+define TVHEADEND_FIX_PNGQUANT_PATH
+	$(SED) "s%^pngquant_bin =.*%pngquant_bin = '$(HOST_DIR)/bin/pngquant'%" \
+		$(@D)/support/mkbundle
+endef
+TVHEADEND_POST_CONFIGURE_HOOKS += TVHEADEND_FIX_PNGQUANT_PATH
+
 define TVHEADEND_BUILD_CMDS
-	$(MAKE) -C $(@D)
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)
 endef
 
 define TVHEADEND_INSTALL_TARGET_CMDS
-	$(MAKE) -C $(@D) DESTDIR="$(TARGET_DIR)" install
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) DESTDIR="$(TARGET_DIR)" install
 endef
 
 # Remove documentation and source files that are not needed because we
@@ -106,14 +122,8 @@ TVHEADEND_POST_INSTALL_TARGET_HOOKS += TVHEADEND_CLEAN_SHARE
 #----------------------------------------------------------------------------
 # To run tvheadend, we need:
 #  - a startup script, and its config file
-#  - a default DB with a tvheadend admin
-#  - a non-root user to run as
-define TVHEADEND_INSTALL_DB
-	$(INSTALL) -D -m 0600 package/tvheadend/accesscontrol.1     \
-		$(TARGET_DIR)/home/tvheadend/.hts/tvheadend/accesscontrol/1
-	chmod -R go-rwx $(TARGET_DIR)/home/tvheadend
-endef
-TVHEADEND_POST_INSTALL_TARGET_HOOKS += TVHEADEND_INSTALL_DB
+#  - a non-root user to run as, and a home for it that is not accessible
+#    to the other users (because there will be crendentials in there)
 
 define TVHEADEND_INSTALL_INIT_SYSV
 	$(INSTALL) -D package/tvheadend/etc.default.tvheadend $(TARGET_DIR)/etc/default/tvheadend
@@ -122,6 +132,9 @@ endef
 
 define TVHEADEND_USERS
 	tvheadend -1 tvheadend -1 * /home/tvheadend - video TVHeadend daemon
+endef
+define TVHEADEND_PERMISSIONS
+	/home/tvheadend r 0700 tvheadend tvheadend - - - - -
 endef
 
 $(eval $(generic-package))

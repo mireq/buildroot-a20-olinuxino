@@ -112,6 +112,7 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_LIB_OPENGL_WAYLAND
 	default y
 	depends on BR2_PACKAGE_GST1_PLUGINS_BAD_LIB_OPENGL_EGL
 	depends on BR2_PACKAGE_WAYLAND
+	select BR2_PACKAGE_WAYLAND_PROTOCOLS
 	select BR2_PACKAGE_GST1_PLUGINS_BAD_LIB_OPENGL_HAS_WINDOW
 
 comment "wayland needs the egl platform and the wayland package"
@@ -163,6 +164,11 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_ASFMUX
 	help
 	  ASF Muxer Plugin
 
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_AUDIOBUFFERSPLIT
+	bool "audiobuffersplit"
+	help
+	  Audio buffersplit plugin
+
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_AUDIOFXBAD
 	bool "audiofxbad"
 	help
@@ -172,6 +178,11 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_AUDIOMIXER
 	bool "audiomixer"
 	help
 	  Audio mixer plugin
+
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_AUDIOMIXMATRIX
+	bool "audiomixmatrix"
+	help
+	  Audio N:M mixer plugin
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_COMPOSITOR
 	bool "compositor"
@@ -198,32 +209,15 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_CAMERABIN2
 	help
 	  Take image snapshots and record movies from camera
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_CDXAPARSE
-	bool "cdxaparse"
-
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_COLOREFFECTS
 	bool "coloreffects"
 	help
 	  Color Look-up Table filters
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DATAURISRC
-	bool "dataurisrc"
-	help
-	  data: URI source
-
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DCCP
-	bool "dccp"
-
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DEBUGUTILS
 	bool "debugutils"
 	help
 	  Collection of elements that may or may not be useful for debugging
-
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DTLS
-	bool "dtls"
-	select BR2_PACKAGE_OPENSSL
-	help
-	  DTLS plugin
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DVBSUBOVERLAY
 	bool "dvdsuboverlay"
@@ -273,9 +267,6 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_GDP
 	help
 	  Payload/depayload GDP packets
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_HDVPARSE
-	bool "hdvparse"
-
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_ID3TAG
 	bool "id3tag"
 	help
@@ -312,11 +303,6 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_LIBRFB
 	help
 	  Connects to a VNC server and decodes RFB stream
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_LIVEADDER
-	bool "liveadder"
-	help
-	  Adds multiple live discontinuous streams
-
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_MIDI
 	bool "midi"
 	help
@@ -342,22 +328,16 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_MPEGPSMUX
 	help
 	  MPEG-PS muxer
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_MVE
-	bool "mve"
-
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_MXF
 	bool "mxf"
 	help
 	  MXF plugin library
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_NUVDEMUX
-	bool "nuvdemux"
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_NETSIM
+	bool "netsim"
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_ONVIF
 	bool "onvif"
-
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_PATCHDETECT
-	bool "patchdetect"
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_PCAPPARSE
 	bool "pcapparse"
@@ -379,11 +359,11 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_REMOVESILENCE
 	help
 	  Removes silence from an audio stream
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_RTP
-	bool "rtp"
-
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SDI
-	bool "sdi"
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_RTMP
+	bool "rtmp"
+	select BR2_PACKAGE_RTMPDUMP
+	help
+	  RTMP plugin
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SDP
 	bool "sdp"
@@ -418,16 +398,23 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SUBENC
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_STEREO
 	bool "stereo"
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_TTA
-	bool "tta"
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_TIMECODE
+	bool "timecode"
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_VIDEOFILTERS
 	bool "videofilters"
 	help
 	  Video filters in gst-plugins-bad
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_VIDEOMEASURE
-	bool "videomeasure"
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_VIDEOFRAME_AUDIOLEVEL
+	bool "videoframe_audiolevel"
+	help
+	  videoframe_audiolevel
+
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_IQA
+	bool "iqa"
+	help
+	  Image Quality Assessment
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_VIDEOPARSERS
 	bool "videoparsers"
@@ -452,25 +439,9 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_YADIF
 
 comment "plugins with external dependencies"
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SHM
-	bool "shm"
-	help
-	  shared memory sink source
-
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_VCD
-	bool "vcd"
-
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_APEXSINK
-	bool "apexsink"
-	select BR2_PACKAGE_OPENSSL
-
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_ASSRENDER
 	bool "assrender"
 	select BR2_PACKAGE_LIBASS
-
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_VOAACENC
-	bool "voaacenc"
-	select BR2_PACKAGE_VO_AACENC
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_BZ2
 	bool "bz2"
@@ -491,8 +462,8 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DASH
 	  DASH demuxer plugin
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DECKLINK
-	depends on BR2_INSTALL_LIBSTDCPP
 	bool "decklink"
+	depends on BR2_INSTALL_LIBSTDCPP
 	help
 	  Blackmagic Decklink plugin
 
@@ -501,21 +472,19 @@ comment "decklink needs a toolchain w/ C++"
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DIRECTFB
 	bool "directfb"
+	default y
 	depends on BR2_PACKAGE_DIRECTFB
-	default y
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_WAYLAND
-	bool "wayland"
-	depends on BR2_PACKAGE_WAYLAND
-	default y
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DVB
+	bool "dvb"
+	# FEC_2_5 / QAM_4_NR definitions
+	depends on BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_7
+	select BR2_PACKAGE_DTV_SCAN_TABLES
 	help
-	  Wayland Video Sink
+	  DVB elements
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_WEBP
-	bool "webp"
-	select BR2_PACKAGE_WEBP
-	help
-	  Webp image format plugin
+comment "dvb needs a toolchain w/ headers >= 3.7"
+	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_7
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_FAAD
 	bool "faad"
@@ -528,6 +497,39 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_FBDEV
 	help
 	  Linux framebuffer video sink
 
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_FDK_AAC
+	bool "fdk-aac"
+	depends on BR2_PACKAGE_FDK_AAC_ARCH_SUPPORTS
+	depends on BR2_INSTALL_LIBSTDCPP
+	select BR2_PACKAGE_FDK_AAC
+	help
+	  MPEG AAC encoder/decoder
+
+comment "fdk-aac needs a toolchain w/ C++"
+	depends on BR2_PACKAGE_FDK_AAC_ARCH_SUPPORTS
+	depends on !BR2_INSTALL_LIBSTDCPP
+
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_GL
+	bool "gl"
+	default y
+	depends on BR2_PACKAGE_GST1_PLUGINS_BAD_HAS_LIB_OPENGL
+
+comment "gl needs the gst1-plugins-bad opengl library"
+	depends on !BR2_PACKAGE_GST1_PLUGINS_BAD_HAS_LIB_OPENGL
+
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_HLS
+	bool "hls"
+	select BR2_PACKAGE_NETTLE if !(BR2_PACKAGE_LIBGCRYPT || BR2_PACKAGE_OPENSSL)
+	help
+	  Fragmented streaming plugins
+
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_KMS
+	bool "kmssink"
+	depends on BR2_TOOLCHAIN_HAS_THREADS #  libdrm -> libpthread-stubs
+	select BR2_PACKAGE_LIBDRM
+	help
+	  KMS video sink
+
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_LIBMMS
 	bool "libmms"
 	depends on BR2_USE_WCHAR # libmms -> libglib2
@@ -539,18 +541,34 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_LIBMMS
 comment "libmms needs a toolchain w/ wchar, threads"
 	depends on !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS
 
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DTLS
+	bool "dtls"
+	select BR2_PACKAGE_OPENSSL
+	help
+	  DTLS plugin
+
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_TTML
+	bool "ttml"
+	depends on BR2_USE_WCHAR # pango -> glib2
+	depends on BR2_TOOLCHAIN_HAS_THREADS # pango -> glib2
+	depends on BR2_INSTALL_LIBSTDCPP # pango -> freetype
+	depends on BR2_TOOLCHAIN_HAS_SYNC_4 # pango -> harfbuzz
+	select BR2_PACKAGE_CAIRO
+	select BR2_PACKAGE_LIBXML2
+	select BR2_PACKAGE_PANGO
+	help
+	  Timed Text Markup Language (TTML) subtitle plugin
+
+comment "ttml needs a toolchain w/ wchar, threads, C++"
+	depends on BR2_TOOLCHAIN_HAS_SYNC_4
+	depends on !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS || \
+		!BR2_INSTALL_LIBSTDCPP
+
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_MPEG2ENC
 	bool "mpeg2enc"
 	select BR2_PACKAGE_LIBMPEG2
 	help
 	  High-quality MPEG-1/2 video encoder
-
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_MPG123
-	bool "mpg123"
-	select BR2_PACKAGE_MPG123
-	depends on BR2_USE_MMU # mpg123
-	help
-	  mp3 decoding based on the mpg123 library
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_MUSEPACK
 	bool "musepack"
@@ -634,38 +652,60 @@ comment "rsvg plugin needs a toolchain w/ C++"
 	depends on !BR2_INSTALL_LIBSTDCPP
 	depends on BR2_TOOLCHAIN_HAS_SYNC_4
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_GL
-	bool "gl"
-	default y
-	depends on BR2_PACKAGE_GST1_PLUGINS_BAD_HAS_LIB_OPENGL
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SBC
+	bool "sbc"
+	select BR2_PACKAGE_SBC
 
-comment "gl needs the gst1-plugins-bad opengl library"
-	depends on !BR2_PACKAGE_GST1_PLUGINS_BAD_HAS_LIB_OPENGL
-
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SDL
-	bool "sdl"
-	select BR2_PACKAGE_SDL
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SHM
+	bool "shm"
+	help
+	  shared memory sink source
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SNDFILE
 	bool "sndfile"
 	select BR2_PACKAGE_LIBSNDFILE
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DVB
-	bool "dvb"
-	select BR2_PACKAGE_DTV_SCAN_TABLES
-	# FEC_2_5 / QAM_4_NR definitions
-	depends on BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_7
-	help
-	  DVB elements
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SRTP
+	bool "srtp"
+	select BR2_PACKAGE_LIBSRTP
 
-comment "dvb needs a toolchain w/ headers >= 3.7"
-	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_7
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_VCD
+	bool "vcd"
 
-config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_HLS
-	bool "hls"
-	select BR2_PACKAGE_GNUTLS
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_VOAACENC
+	bool "voaacenc"
+	select BR2_PACKAGE_VO_AACENC
+
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_WAYLAND
+	bool "wayland"
+	default y
+	depends on BR2_PACKAGE_WAYLAND
+	select BR2_PACKAGE_WAYLAND_PROTOCOLS
 	help
-	  Fragmented streaming plugins
+	  Wayland Video Sink
+
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_WEBP
+	bool "webp"
+	select BR2_PACKAGE_WEBP
+	help
+	  Webp image format plugin
+
+config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_WEBRTCDSP
+	bool "webrtcdsp"
+	# All depends from webrtc-audio-processing
+	depends on BR2_PACKAGE_WEBRTC_AUDIO_PROCESSING_ARCH_SUPPORTS
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_4_8
+	depends on BR2_TOOLCHAIN_HAS_THREADS_NPTL
+	select BR2_PACKAGE_WEBRTC_AUDIO_PROCESSING
+	select BR2_PACKAGE_WEBRTC
+	help
+	  WebRTC echo-cancellation, gain control and noise suppression
+
+comment "webrtcdsp needs a toolchain w/ C++, NPTL, gcc >= 4.8"
+	depends on BR2_PACKAGE_WEBRTC_AUDIO_PROCESSING_ARCH_SUPPORTS
+	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_TOOLCHAIN_HAS_THREADS_NPTL \
+		|| !BR2_TOOLCHAIN_GCC_AT_LEAST_4_8
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_X265
 	bool "x265"

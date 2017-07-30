@@ -7,16 +7,20 @@
 GST_FSL_PLUGINS_VERSION = 4.0.3
 GST_FSL_PLUGINS_SITE = $(FREESCALE_IMX_SITE)
 
-# Most is LGPLv2+, but some sources are copied from upstream and are
-# LGPLv2.1+, which essentially makes it LGPLv2.1+
-GST_FSL_PLUGINS_LICENSE = LGPLv2+, LGPLv2.1+, PROPRIETARY (asf.h)
+# Most is LGPL-2.0+, but some sources are copied from upstream and are
+# LGPL-2.1+, which essentially makes it LGPL-2.1+
+GST_FSL_PLUGINS_LICENSE = LGPL-2.0+, LGPL-2.1+, PROPRIETARY (asf.h)
 GST_FSL_PLUGINS_LICENSE_FILES = COPYING-LGPL-2.1 COPYING-LGPL-2
 
 GST_FSL_PLUGINS_INSTALL_STAGING = YES
 GST_FSL_PLUGINS_AUTORECONF = YES
 
 GST_FSL_PLUGINS_DEPENDENCIES += host-pkgconf gstreamer gst-plugins-base \
-	libfslvpuwrap imx-lib imx-vpu libfslparser libfslcodec
+	imx-lib imx-parser imx-codec
+
+ifeq ($(BR2_PACKAGE_FREESCALE_IMX_HAS_VPU),y)
+GST_FSL_PLUGINS_DEPENDENCIES += imx-vpuwrap
+endif
 
 GST_FSL_PLUGINS_CONF_ENV = \
 	PLATFORM=$(BR2_PACKAGE_GST_FSL_PLUGINS_PLATFORM) \

@@ -38,7 +38,7 @@ choice
 	  Select the specific U-Boot version you want to use
 
 config BR2_TARGET_UBOOT_LATEST_VERSION
-	bool "2016.01"
+	bool "2017.07"
 
 config BR2_TARGET_UBOOT_CUSTOM_VERSION
 	bool "Custom version"
@@ -54,6 +54,9 @@ config BR2_TARGET_UBOOT_CUSTOM_GIT
 config BR2_TARGET_UBOOT_CUSTOM_HG
 	bool "Custom Mercurial repository"
 
+config BR2_TARGET_UBOOT_CUSTOM_SVN
+	bool "Custom Subversion repository"
+
 endchoice
 
 config BR2_TARGET_UBOOT_CUSTOM_VERSION_VALUE
@@ -64,7 +67,7 @@ config BR2_TARGET_UBOOT_CUSTOM_TARBALL_LOCATION
 	string "URL of custom U-Boot tarball"
 	depends on BR2_TARGET_UBOOT_CUSTOM_TARBALL
 
-if BR2_TARGET_UBOOT_CUSTOM_GIT || BR2_TARGET_UBOOT_CUSTOM_HG
+if BR2_TARGET_UBOOT_CUSTOM_GIT || BR2_TARGET_UBOOT_CUSTOM_HG || BR2_TARGET_UBOOT_CUSTOM_SVN
 
 config BR2_TARGET_UBOOT_CUSTOM_REPO_URL
 	string "URL of custom repository"
@@ -76,34 +79,23 @@ config BR2_TARGET_UBOOT_CUSTOM_REPO_VERSION
 	default BR2_TARGET_UBOOT_CUSTOM_GIT_VERSION \
 		if BR2_TARGET_UBOOT_CUSTOM_GIT_VERSION != ""  # legacy
 	help
-	  Revision to use in the typical format used by Git/Mercurial
+	  Revision to use in the typical format used by Git/Mercurial/Subversion
 	  E.G. a sha id, a tag, branch, ..
 
 endif
 
 config BR2_TARGET_UBOOT_VERSION
 	string
-	default "2016.01"	if BR2_TARGET_UBOOT_LATEST_VERSION
+	default "2017.07"	if BR2_TARGET_UBOOT_LATEST_VERSION
 	default BR2_TARGET_UBOOT_CUSTOM_VERSION_VALUE \
 		if BR2_TARGET_UBOOT_CUSTOM_VERSION
 	default "custom"	if BR2_TARGET_UBOOT_CUSTOM_TARBALL
 	default BR2_TARGET_UBOOT_CUSTOM_REPO_VERSION \
-		if BR2_TARGET_UBOOT_CUSTOM_GIT || BR2_TARGET_UBOOT_CUSTOM_HG
-
-config BR2_TARGET_UBOOT_CUSTOM_PATCH_DIR
-	string "custom patch dir"
-	depends on BR2_DEPRECATED_SINCE_2015_05
-	help
-	  If your board requires custom patches, add the path to the
-	  directory containing the patches here. The patches must be
-	  named uboot-<something>.patch.
-
-	  Most users may leave this empty
-
-	  NOTE: Use BR2_TARGET_UBOOT_PATCH instead.
+		if BR2_TARGET_UBOOT_CUSTOM_GIT || BR2_TARGET_UBOOT_CUSTOM_HG || BR2_TARGET_UBOOT_CUSTOM_SVN
 
 config BR2_TARGET_UBOOT_PATCH
 	string "Custom U-Boot patches"
+	default BR2_TARGET_UBOOT_CUSTOM_PATCH_DIR if BR2_TARGET_UBOOT_CUSTOM_PATCH_DIR != ""  # legacy
 	help
 	  A space-separated list of patches to apply to U-Boot.
 	  Each patch can be described as an URL, a local file path,
@@ -146,9 +138,21 @@ config BR2_TARGET_UBOOT_NEEDS_DTC
 	  Select this option if your U-Boot board configuration
 	  requires the Device Tree compiler to be available.
 
-choice
-	prompt "U-Boot binary format"
-	default BR2_TARGET_UBOOT_FORMAT_BIN
+config BR2_TARGET_UBOOT_NEEDS_PYLIBFDT
+	bool "U-Boot needs pylibfdt"
+	help
+	  Select this option if your U-Boot board configuration
+	  requires the Python libfdt library to be available.
+
+config BR2_TARGET_UBOOT_NEEDS_OPENSSL
+	bool "U-Boot needs OpenSSL"
+	help
+	  Select this option if your U-Boot board configuration
+	  requires OpenSSL to be available on the host. This is
+	  typically the case when the board configuration has
+	  CONFIG_FIT_SIGNATURE enabled.
+
+menu "U-Boot binary format"
 
 config BR2_TARGET_UBOOT_FORMAT_AIS
 	bool "u-boot.ais"
@@ -159,6 +163,10 @@ config BR2_TARGET_UBOOT_FORMAT_AIS
 
 config BR2_TARGET_UBOOT_FORMAT_BIN
 	bool "u-boot.bin"
+	default y
+
+config BR2_TARGET_UBOOT_FORMAT_DTB_BIN
+	bool "u-boot-dtb.bin"
 
 config BR2_TARGET_UBOOT_FORMAT_DTB_IMG
 	bool "u-boot-dtb.img"
@@ -261,18 +269,20 @@ config BR2_TARGET_UBOOT_FORMAT_CUSTOM
 	help
 	  On some platforms, the standard U-Boot binary is not called
 	  u-boot.bin, but u-boot<something>.bin. If this is your case,
-	  you should select this option and specify the correct name
+	  you should select this option and specify the correct name(s)
 	  in BR2_TARGET_UBOOT_FORMAT_CUSTOM_NAME.
 
-endchoice
-
 config BR2_TARGET_UBOOT_FORMAT_CUSTOM_NAME
-	string "U-Boot binary format: custom name"
+	string "U-Boot binary format: custom names"
 	depends on BR2_TARGET_UBOOT_FORMAT_CUSTOM
 	help
-	  Specify the correct name of the output binary created by
-	  U-Boot, if it is not one of the default names. For example:
+	  In case the U-Boot binary for the target platform is not among
+	  the default names, one or more custom names can be listed here.
+	  Use space to separate multiple names.
+	  Example:
 	  u-boot_magic.bin
+
+endmenu
 
 config BR2_TARGET_UBOOT_OMAP_IFT
 	depends on BR2_TARGET_UBOOT_FORMAT_BIN
@@ -322,9 +332,9 @@ config BR2_TARGET_UBOOT_SPL_NAME
 	default "spl/u-boot-spl.bin"
 	depends on BR2_TARGET_UBOOT_SPL
 	help
-	  This is the name of the SPL binary, generated during
-	  u-boot build. For most platform it is spl/u-boot-spl.bin
-	  but not always. It is MLO on OMAP for example.
+	  A space-separated list of SPL binaries, generated during
+	  u-boot build. For most platform it is spl/u-boot-spl.bin but
+	  not always. It is MLO on OMAP and SPL on i.MX6 for example.
 
 config BR2_TARGET_UBOOT_ZYNQ_IMAGE
 	bool "Generate image for Xilinx Zynq"
@@ -338,6 +348,30 @@ config BR2_TARGET_UBOOT_ZYNQ_IMAGE
 	  for u-boot-dtb.img file so this U-Boot format is required
 	  to be set.
 
+config BR2_TARGET_UBOOT_ALTERA_SOCFPGA_IMAGE_CRC
+	bool "CRC image for Altera SoC FPGA (mkpimage)"
+	depends on BR2_arm
+	depends on BR2_TARGET_UBOOT_SPL || BR2_TARGET_UBOOT_FORMAT_DTB_BIN
+	help
+	  Pass the U-Boot image through the mkpimage tool to enable
+	  booting on the Altera SoC FPGA based platforms.
+
+	  On some platforms, it's the SPL that needs to be passed
+	  through mkpimage. On some other platforms there is no SPL
+	  because the internal SRAM is big enough to store the full
+	  U-Boot. In this case, it's directly the full U-Boot image
+	  that is passed through mkpimage.
+
+	  If BR2_TARGET_UBOOT_SPL is enabled then
+	  BR2_TARGET_UBOOT_SPL_NAME is converted by mkpimage using
+	  header version 0.
+
+	  Otherwise the full u-boot-dtb.bin is converted using
+	  mkpimage header version 1.
+
+	  In either case the resulting file will be given a .crc
+	  extension.
+
 menuconfig BR2_TARGET_UBOOT_ENVIMAGE
 	bool "Environment image"
 	help
@@ -349,9 +383,13 @@ menuconfig BR2_TARGET_UBOOT_ENVIMAGE
 if BR2_TARGET_UBOOT_ENVIMAGE
 
 config BR2_TARGET_UBOOT_ENVIMAGE_SOURCE
-	string "Source file for environment"
+	string "Source files for environment"
 	help
-	  Text file describing the environment.
+	  Text files describing the environment. Files should have
+	  lines of the form var=value, one per line. Blank lines and
+	  lines starting with a # are ignored.
+
+	  Multiple source files are concatenated in the order listed.
 
 config BR2_TARGET_UBOOT_ENVIMAGE_SIZE
 	string "Size of environment"
@@ -374,5 +412,35 @@ config BR2_TARGET_UBOOT_ENVIMAGE_REDUNDANT
 	  mechanism of U-Boot.
 
 endif # BR2_TARGET_UBOOT_ENVIMAGE
+
+config BR2_TARGET_UBOOT_BOOT_SCRIPT
+	bool "Generate a U-Boot boot script"
+	help
+	  Generate a U-Boot boot script, given a file listing U-Boot
+	  commands to be executed at boot time. The generated boot
+	  script will be called 'boot.scr'.
+
+if BR2_TARGET_UBOOT_BOOT_SCRIPT
+
+config BR2_TARGET_UBOOT_BOOT_SCRIPT_SOURCE
+	string "U-Boot boot script source"
+	help
+	  Source file to generate the U-Boot boot script.
+
+endif
+
+if BR2_TARGET_UBOOT_BUILD_SYSTEM_KCONFIG
+
+config BR2_TARGET_UBOOT_CUSTOM_DTS_PATH
+	string "Device Tree Source file paths"
+	help
+	  Space-separated list of paths to device tree source files
+	  that will be copied to arch/ARCH/dts/ before starting the
+	  build.
+
+	  To use this device tree source file, the U-Boot configuration
+	  file must refer to it.
+
+endif
 
 endif # BR2_TARGET_UBOOT

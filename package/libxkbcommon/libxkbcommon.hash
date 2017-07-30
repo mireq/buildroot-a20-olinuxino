@@ -1,3 +1,2 @@
-# From http://lists.freedesktop.org/archives/wayland-devel/2014-October/017836.html
-md5	2e1faeafcc609c30af3a561a91e84158	libxkbcommon-0.5.0.tar.xz
-sha1	7127993bfb69e13cdff25fb8b3c8f26ce6be5bfa	libxkbcommon-0.5.0.tar.xz
+# From https://lists.freedesktop.org/archives/wayland-devel/2017-January/032725.html
+sha256	ba59305d2e19e47c27ea065c2e0df96ebac6a3c6e97e28ae5620073b6084e68b	libxkbcommon-0.7.1.tar.xz

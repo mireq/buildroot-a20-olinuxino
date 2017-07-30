@@ -4,9 +4,10 @@
 #
 ################################################################################
 
-FASTD_VERSION = v17
-FASTD_SITE = git://git.universe-factory.net/fastd
-FASTD_LICENSE = BSD-2c
+FASTD_VERSION = 18
+FASTD_SITE = https://projects.universe-factory.net/attachments/download/86
+FASTD_SOURCE = fastd-$(FASTD_VERSION).tar.xz
+FASTD_LICENSE = BSD-2-Clause
 FASTD_LICENSE_FILES = COPYRIGHT
 FASTD_CONF_OPTS = -DENABLE_LIBSODIUM=ON
 FASTD_DEPENDENCIES = host-bison host-pkgconf libuecc libsodium libcap

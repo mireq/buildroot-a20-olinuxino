@@ -7,13 +7,13 @@
 # The original upstream was forked to the github repository in 2014 to
 # pull fixes from other distribution and centralize the changes after
 # the upstream seemed to have gone dormant.  The fork contains the
-# latest changes including msul support, removing a libsysfs dependency
+# latest changes including musl support, removing a libsysfs dependency
 # and IPv6 updates.
 # http://www.spinics.net/lists/netdev/msg279881.html
 
-IPUTILS_VERSION = 3a86a2542c6fe29413c439bebeae11ec8a57ec7c
+IPUTILS_VERSION = s20161105
 IPUTILS_SITE = $(call github,iputils,iputils,$(IPUTILS_VERSION))
-IPUTILS_LICENSE = GPLv2+, BSD-3c, BSD-4c
+IPUTILS_LICENSE = GPL-2.0+, BSD-3-Clause, BSD-4-Clause
 # Only includes a license file for BSD
 IPUTILS_LICENSE_FILES = ninfod/COPYING
 
@@ -55,7 +55,7 @@ IPUTILS_MAKE_OPTS += USE_CRYPTO=no
 endif
 
 define IPUTILS_BUILD_CMDS
-	$(MAKE) -C $(@D) $(IPUTILS_MAKE_OPTS)
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) $(IPUTILS_MAKE_OPTS)
 endef
 
 define IPUTILS_INSTALL_TARGET_CMDS
@@ -66,7 +66,6 @@ define IPUTILS_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 755 $(@D)/rdisc       $(TARGET_DIR)/sbin/rdisc
 	$(INSTALL) -D -m 755 $(@D)/tftpd       $(TARGET_DIR)/usr/sbin/in.tftpd
 	$(INSTALL) -D -m 755 $(@D)/tracepath   $(TARGET_DIR)/bin/tracepath
-	$(INSTALL) -D -m 755 $(@D)/tracepath6  $(TARGET_DIR)/bin/tracepath6
 	$(INSTALL) -D -m 755 $(@D)/traceroute6 $(TARGET_DIR)/bin/traceroute6
 endef
 

@@ -1,2 +1,2 @@
-# From https://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/NSS_3_22_2_RTM/src/SHA256SUMS
-sha256	07d49287c527ac31200f02dcf8494cef19e936d8ed470802749c4dfc782d3650	nss-3.22.2.tar.gz
+# From https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_31_RTM/src/SHA256SUMS
+sha256	e90561256a3271486162c1fbe8d614d118c333d36a4455be2af8688bd420a65d	nss-3.31.tar.gz

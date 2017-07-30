@@ -6,21 +6,22 @@
 
 QUOTA_VERSION = 4.01
 QUOTA_SITE = http://downloads.sourceforge.net/project/linuxquota/quota-tools/$(QUOTA_VERSION)
-QUOTA_DEPENDENCIES = host-gettext
+QUOTA_DEPENDENCIES = $(TARGET_NLS_DEPENDENCIES)
 QUOTA_AUTORECONF = YES
-QUOTA_LICENSE = GPLv2+
+QUOTA_LICENSE = GPL-2.0+
 QUOTA_CONF_OPTS = --disable-strip-binaries
+QUOTA_LIBS = $(TARGET_NLS_LIBS)
 
 QUOTA_CFLAGS = $(TARGET_CFLAGS)
-
-ifeq ($(BR2_NEEDS_GETTEXT_IF_LOCALE),y)
-QUOTA_DEPENDENCIES += gettext
-QUOTA_LIBS += -lintl
-endif
 
 ifeq ($(BR2_PACKAGE_E2FSPROGS),y)
 QUOTA_DEPENDENCIES += e2fsprogs
 QUOTA_CONF_OPTS += --enable-ext2direct
+# quote does not use pkg-config to find e2fsprogs, so it does not know it
+# may require -pthreads in case of static build
+ifeq ($(BR2_STATIC_LIBS)$(BR2_TOOLCHAIN_HAS_THREADS),yy)
+QUOTA_LIBS += -pthread
+endif
 else
 QUOTA_CONF_OPTS += --disable-ext2direct
 endif

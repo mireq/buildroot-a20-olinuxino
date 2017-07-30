@@ -4,27 +4,16 @@
 #
 ################################################################################
 
-GST1_PLUGINS_BASE_VERSION = 1.6.3
+GST1_PLUGINS_BASE_VERSION = 1.12.2
 GST1_PLUGINS_BASE_SOURCE = gst-plugins-base-$(GST1_PLUGINS_BASE_VERSION).tar.xz
-GST1_PLUGINS_BASE_SITE = http://gstreamer.freedesktop.org/src/gst-plugins-base
+GST1_PLUGINS_BASE_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-base
 GST1_PLUGINS_BASE_INSTALL_STAGING = YES
 GST1_PLUGINS_BASE_LICENSE_FILES = COPYING.LIB
-GST1_PLUGINS_BASE_LICENSE = LGPLv2+, LGPLv2.1+
-
-# freetype is only used by examples, but if it is not found
-# and the host has a freetype-config script, then the host
-# include dirs are added to the search path causing trouble
-GST1_PLUGINS_BASE_CONF_ENV =
-	FT2_CONFIG=/bin/false \
-	ac_cv_header_stdint_t="stdint.h"
+GST1_PLUGINS_BASE_LICENSE = LGPL-2.0+, LGPL-2.1+
 
 # gio_unix_2_0 is only used for tests
 GST1_PLUGINS_BASE_CONF_OPTS = \
 	--disable-examples \
-	--disable-oggtest \
-	--disable-vorbistest \
-	--disable-gio_unix_2_0 \
-	--disable-freetypetest \
 	--disable-valgrind
 
 # Options which require currently unpackaged libraries
@@ -102,6 +91,12 @@ else
 GST1_PLUGINS_BASE_CONF_OPTS += --disable-audioresample
 endif
 
+ifeq ($(BR2_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_RAWPARSE),y)
+GST1_PLUGINS_BASE_CONF_OPTS += --enable-rawparse
+else
+GST1_PLUGINS_BASE_CONF_OPTS += --disable-rawparse
+endif
+
 ifeq ($(BR2_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_SUBPARSE),y)
 GST1_PLUGINS_BASE_CONF_OPTS += --enable-subparse
 else
@@ -174,6 +169,13 @@ GST1_PLUGINS_BASE_CONF_OPTS += --enable-ivorbis
 GST1_PLUGINS_BASE_DEPENDENCIES += tremor
 else
 GST1_PLUGINS_BASE_CONF_OPTS += --disable-ivorbis
+endif
+
+ifeq ($(BR2_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_OPUS),y)
+GST1_PLUGINS_BASE_CONF_OPTS += --enable-opus
+GST1_PLUGINS_BASE_DEPENDENCIES += opus
+else
+GST1_PLUGINS_BASE_CONF_OPTS += --disable-opus
 endif
 
 ifeq ($(BR2_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_OGG),y)

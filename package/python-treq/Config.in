@@ -1,5 +1,6 @@
 config BR2_PACKAGE_PYTHON_TREQ
 	bool "python-treq"
+	depends on BR2_INSTALL_LIBSTDCPP # python-pyopenssl
 	select BR2_PACKAGE_PYTHON_REQUESTS # runtime
 	select BR2_PACKAGE_PYTHON_SERVICE_IDENTITY # runtime
 	select BR2_PACKAGE_PYTHON_SIX # runtime
@@ -11,3 +12,6 @@ config BR2_PACKAGE_PYTHON_TREQ
 	  API for making HTTP requests when using Twisted.
 
 	  https://github.com/twisted/treq
+
+comment "python-treq needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP

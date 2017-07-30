@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-TCPREPLAY_VERSION = 4.1.1
+TCPREPLAY_VERSION = 4.2.6
 TCPREPLAY_SITE = https://github.com/appneta/tcpreplay/releases/download/v$(TCPREPLAY_VERSION)
-TCPREPLAY_LICENSE = GPLv3
+TCPREPLAY_LICENSE = GPL-3.0
 TCPREPLAY_LICENSE_FILES = docs/LICENSE
 TCPREPLAY_CONF_ENV = \
 	tr_cv_libpcap_version=">= 0.7.0" \
@@ -19,6 +19,10 @@ TCPREPLAY_DEPENDENCIES = libpcap
 TCPREPLAY_LIBS = $(STAGING_DIR)/usr/bin/pcap-config --static --libs
 TCPREPLAY_CONF_ENV += ac_cv_search_pcap_close="`$(TCPREPLAY_LIBS)`" \
 	LIBS="`$(TCPREPLAY_LIBS)`"
+
+ifeq ($(BR2_STATIC_LIBS),y)
+TCPREPLAY_CONF_OPTS += --enable-dynamic-link=no
+endif
 
 ifeq ($(BR2_PACKAGE_TCPDUMP),y)
 TCPREPLAY_CONF_ENV += ac_cv_path_tcpdump_path=/usr/sbin/tcpdump

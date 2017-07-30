@@ -4,11 +4,11 @@
 #
 ################################################################################
 
-GAWK_VERSION = 4.1.3
+GAWK_VERSION = 4.1.4
 GAWK_SOURCE = gawk-$(GAWK_VERSION).tar.xz
 GAWK_SITE = $(BR2_GNU_MIRROR)/gawk
 GAWK_DEPENDENCIES = host-gawk
-GAWK_LICENSE = GPLv3+
+GAWK_LICENSE = GPL-3.0+
 GAWK_LICENSE_FILES = COPYING
 
 # Prefer full-blown gawk over busybox awk
@@ -35,9 +35,6 @@ GAWK_DEPENDENCIES += readline
 else
 GAWK_CONF_OPTS += --without-readline
 endif
-
-# We don't have a host-busybox, and we don't want to use readline or mpfr
-HOST_GAWK_DEPENDENCIES =
 
 HOST_GAWK_CONF_OPTS = --without-readline --without-mpfr
 

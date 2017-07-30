@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-TRANSMISSION_VERSION = 2.90
-TRANSMISSION_SITE = http://download.transmissionbt.com/files
+TRANSMISSION_VERSION = 2.92
+TRANSMISSION_SITE = https://github.com/transmission/transmission-releases/raw/master
 TRANSMISSION_SOURCE = transmission-$(TRANSMISSION_VERSION).tar.xz
 TRANSMISSION_DEPENDENCIES = \
 	host-pkgconf \
@@ -18,8 +18,19 @@ TRANSMISSION_AUTORECONF = YES
 TRANSMISSION_CONF_OPTS = \
 	--disable-libnotify \
 	--enable-lightweight
-TRANSMISSION_LICENSE = GPLv2 or GPLv3 with OpenSSL exception
+TRANSMISSION_LICENSE = GPL-2.0 or GPL-3.0 with OpenSSL exception
 TRANSMISSION_LICENSE_FILES = COPYING
+
+ifeq ($(BR2_PACKAGE_LIBMINIUPNPC),y)
+TRANSMISSION_DEPENDENCIES += libminiupnpc
+endif
+
+ifeq ($(BR2_PACKAGE_LIBNATPMP),y)
+TRANSMISSION_DEPENDENCIES += libnatpmp
+TRANSMISSION_CONF_OPTS += --enable-external-natpmp
+else
+TRANSMISSION_CONF_OPTS += --disable-external-natpmp
+endif
 
 ifeq ($(BR2_PACKAGE_TRANSMISSION_UTP),y)
 TRANSMISSION_CONF_OPTS += --enable-utp

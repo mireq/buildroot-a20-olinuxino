@@ -5,9 +5,9 @@
 ################################################################################
 
 I2C_TOOLS_VERSION = 3.1.2
-I2C_TOOLS_SOURCE = i2c-tools-$(I2C_TOOLS_VERSION).tar.bz2
-I2C_TOOLS_SITE = http://dl.lm-sensors.org/i2c-tools/releases
-I2C_TOOLS_LICENSE = GPLv2+, GPLv2 (py-smbus)
+I2C_TOOLS_SOURCE = i2c-tools-$(I2C_TOOLS_VERSION).tar.xz
+I2C_TOOLS_SITE = https://www.kernel.org/pub/software/utils/i2c-tools
+I2C_TOOLS_LICENSE = GPL-2.0+, GPL-2.0 (py-smbus)
 I2C_TOOLS_LICENSE_FILES = COPYING
 
 ifeq ($(BR2_PACKAGE_PYTHON),y)
@@ -16,6 +16,10 @@ endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3),y)
 I2C_TOOLS_DEPENDENCIES += python3
+endif
+
+ifeq ($(BR2_PACKAGE_BUSYBOX),y)
+I2C_TOOLS_DEPENDENCIES += busybox
 endif
 
 # Build/install steps mirror the distutil python package type in the python package
@@ -27,16 +31,16 @@ I2C_TOOLS_PYTHON_BASE_ENV = \
 	CFLAGS="$(TARGET_CFLAGS) -I../include"
 
 define I2C_TOOLS_BUILD_PYSMBUS
-	(cd $(@D)/py-smbus;  \
+	(cd $(@D)/py-smbus; \
 	$(I2C_TOOLS_PYTHON_BASE_ENV) \
-		$(HOST_DIR)/usr/bin/python setup.py build \
+		$(HOST_DIR)/bin/python setup.py build \
 		$(PKG_PYTHON_DISTUTILS_BUILD_OPTS))
 endef
 
 define I2C_TOOLS_INSTALL_PYSMBUS
 	(cd $(@D)/py-smbus; \
 	$(I2C_TOOLS_PYTHON_BASE_ENV) \
-		$(HOST_DIR)/usr/bin/python setup.py install \
+		$(HOST_DIR)/bin/python setup.py install \
 		$(PKG_PYTHON_DISTUTILS_INSTALL_TARGET_OPTS))
 endef
 
@@ -50,7 +54,7 @@ endef
 define I2C_TOOLS_INSTALL_TARGET_CMDS
 	for i in i2cdump i2cget i2cset i2cdetect; \
 	do \
-		$(INSTALL) -m 755 -D $(@D)/tools/$$i $(TARGET_DIR)/usr/bin/$$i; \
+		$(INSTALL) -m 755 -D $(@D)/tools/$$i $(TARGET_DIR)/usr/sbin/$$i; \
 	done
 	$(I2C_TOOLS_INSTALL_PYSMBUS)
 endef

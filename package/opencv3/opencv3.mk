@@ -4,18 +4,24 @@
 #
 ################################################################################
 
-OPENCV3_VERSION = 3.0.0
-OPENCV3_SITE = $(call github,itseez,opencv,$(OPENCV3_VERSION))
+OPENCV3_VERSION = 3.2.0
+OPENCV3_SITE = $(call github,opencv,opencv,$(OPENCV3_VERSION))
 OPENCV3_INSTALL_STAGING = YES
-OPENCV3_LICENSE = BSD-3c
+OPENCV3_LICENSE = BSD-3-Clause
 OPENCV3_LICENSE_FILES = LICENSE
+
+# Uses __atomic_fetch_add_4
+ifeq ($(BR2_TOOLCHAIN_HAS_LIBATOMIC),y)
+OPENCV3_CONF_OPTS += -DCMAKE_CXX_FLAGS="$(TARGET_CXXFLAGS) -latomic"
+endif
 
 # OpenCV component options
 OPENCV3_CONF_OPTS += \
 	-DBUILD_DOCS=OFF \
 	-DBUILD_PERF_TESTS=$(if $(BR2_PACKAGE_OPENCV3_BUILD_PERF_TESTS),ON,OFF) \
 	-DBUILD_TESTS=$(if $(BR2_PACKAGE_OPENCV3_BUILD_TESTS),ON,OFF) \
-	-DBUILD_WITH_DEBUG_INFO=OFF
+	-DBUILD_WITH_DEBUG_INFO=OFF \
+	-DDOWNLOAD_EXTERNAL_TEST_DATA=OFF
 
 ifeq ($(BR2_PACKAGE_OPENCV3_BUILD_TESTS)$(BR2_PACKAGE_OPENCV3_BUILD_PERF_TESTS),)
 OPENCV3_CONF_OPTS += -DINSTALL_TEST=OFF
@@ -70,7 +76,6 @@ OPENCV3_CONF_OPTS += \
 	-DBUILD_opencv_core=ON \
 	-DBUILD_opencv_features2d=$(if $(BR2_PACKAGE_OPENCV3_LIB_FEATURES2D),ON,OFF) \
 	-DBUILD_opencv_flann=$(if $(BR2_PACKAGE_OPENCV3_LIB_FLANN),ON,OFF) \
-	-DBUILD_opencv_hal=ON \
 	-DBUILD_opencv_highgui=$(if $(BR2_PACKAGE_OPENCV3_LIB_HIGHGUI),ON,OFF) \
 	-DBUILD_opencv_imgcodecs=$(if $(BR2_PACKAGE_OPENCV3_LIB_IMGCODECS),ON,OFF) \
 	-DBUILD_opencv_imgproc=$(if $(BR2_PACKAGE_OPENCV3_LIB_IMGPROC),ON,OFF) \
@@ -92,22 +97,8 @@ OPENCV3_CONF_OPTS += \
 #
 # * PowerPC support is turned off since its only effect is altering CFLAGS,
 #   adding '-mcpu=G3 -mtune=G5' to them, which is already handled by Buildroot.
-# * fma3 and popcnt support is disabled because according to gcc manual [2], it
-#   is only available on x86_64 haswell, broadwell and knl architecture.
-#
-# [2] https://gcc.gnu.org/onlinedocs/gcc-5.1.0/gcc/x86-Options.html#x86-Options
 OPENCV3_CONF_OPTS += \
-	-DENABLE_AVX=$(if $(BR2_X86_CPU_HAS_AVX),ON,OFF) \
-	-DENABLE_AVX2=$(if $(BR2_X86_CPU_HAS_AVX2),ON,OFF) \
-	-DENABLE_FMA3=OFF \
-	-DENABLE_POPCNT=OFF \
-	-DENABLE_POWERPC=OFF \
-	-DENABLE_SSE=$(if $(BR2_X86_CPU_HAS_SSE),ON,OFF) \
-	-DENABLE_SSE2=$(if $(BR2_X86_CPU_HAS_SSE2),ON,OFF) \
-	-DENABLE_SSE3=$(if $(BR2_X86_CPU_HAS_SSE3),ON,OFF) \
-	-DENABLE_SSE41=$(if $(BR2_X86_CPU_HAS_SSE4),ON,OFF) \
-	-DENABLE_SSE42=$(if $(BR2_X86_CPU_HAS_SSE42),ON,OFF) \
-	-DENABLE_SSSE3=$(if $(BR2_X86_CPU_HAS_SSSE3),ON,OFF)
+	-DENABLE_POWERPC=OFF
 
 # Cuda stuff
 OPENCV3_CONF_OPTS += \
@@ -201,14 +192,16 @@ OPENCV3_CONF_OPTS += \
 	-DWITH_EIGEN=OFF \
 	-DWITH_GDAL=OFF \
 	-DWITH_GPHOTO2=OFF \
+	-DWITH_LAPACK=OFF \
+	-DWITH_MATLAB=OFF \
 	-DWITH_OPENCL=OFF \
 	-DWITH_OPENCL_SVM=OFF \
 	-DWITH_OPENEXR=OFF \
-	-DWITH_OPENGL=OFF \
-	-DWITH_OPENMP=OFF \
 	-DWITH_OPENNI2=OFF \
 	-DWITH_OPENNI=OFF \
 	-DWITH_UNICAP=OFF \
+	-DWITH_VA=OFF \
+	-DWITH_VA_INTEL=OFF \
 	-DWITH_VTK=OFF \
 	-DWITH_WEBP=OFF \
 	-DWITH_XINE=OFF
@@ -315,7 +308,7 @@ ifeq ($(BR2_PACKAGE_PYTHON),y)
 OPENCV3_CONF_OPTS += \
 	-DBUILD_opencv_python2=ON \
 	-DBUILD_opencv_python3=OFF \
-	-DPYTHON2_EXECUTABLE=$(HOST_DIR)/usr/bin/python2 \
+	-DPYTHON2_EXECUTABLE=$(HOST_DIR)/bin/python2 \
 	-DPYTHON2_INCLUDE_PATH=$(STAGING_DIR)/usr/include/python$(PYTHON_VERSION_MAJOR) \
 	-DPYTHON2_LIBRARIES=$(STAGING_DIR)/usr/lib/libpython$(PYTHON_VERSION_MAJOR).so \
 	-DPYTHON2_NUMPY_INCLUDE_DIRS=$(STAGING_DIR)/usr/lib/python$(PYTHON_VERSION_MAJOR)/site-packages/numpy/core/include \
@@ -326,7 +319,7 @@ else
 OPENCV3_CONF_OPTS += \
 	-DBUILD_opencv_python2=OFF \
 	-DBUILD_opencv_python3=ON \
-	-DPYTHON3_EXECUTABLE=$(HOST_DIR)/usr/bin/python3 \
+	-DPYTHON3_EXECUTABLE=$(HOST_DIR)/bin/python3 \
 	-DPYTHON3_INCLUDE_PATH=$(STAGING_DIR)/usr/include/python$(PYTHON3_VERSION_MAJOR)m \
 	-DPYTHON3_LIBRARIES=$(STAGING_DIR)/usr/lib/libpython$(PYTHON3_VERSION_MAJOR)m.so \
 	-DPYTHON3_NUMPY_INCLUDE_DIRS=$(STAGING_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/numpy/core/include \

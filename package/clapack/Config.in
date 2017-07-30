@@ -1,4 +1,4 @@
-comment "clapack needs an (e)glibc toolchain"
+comment "clapack needs a glibc toolchain"
 	depends on BR2_powerpc
 	depends on !BR2_TOOLCHAIN_USES_GLIBC
 
@@ -12,6 +12,8 @@ config BR2_PACKAGE_CLAPACK
 	# because of the "_" symbol prefix:
 	# http://autobuild.buildroot.net/results/a28df0ba10803e6e54c2f8160bbd8190cba4d690/
 	depends on !BR2_bfin
+	# assembler: Error: value out of range
+	depends on !BR2_m68k_cf
 	help
 	  BLAS and LAPACK C implementation (f2c'ed version of).
 
@@ -21,10 +23,11 @@ config BR2_PACKAGE_CLAPACK_ARITH_H
 	string "Custom BLAS arith.h"
 	depends on BR2_PACKAGE_CLAPACK
 	help
-	  To optimize BLAS library for the hardware, an 'arith.h' header should
-	  be provided.
+	  To optimize BLAS library for the hardware, an 'arith.h' header
+	  should be provided.
 
 	  If empty, the library will not be optimized by the compiler.
 
-	  In any case an 'arithchk' program is built (but not installed), to be run
-	  on the target to generate this arith.h header.
+	  In any case an 'arithchk' program is built
+	  (but not installed), to be run on the target to generate this
+	  arith.h header.

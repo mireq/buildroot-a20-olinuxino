@@ -1,4 +1,4 @@
-# http://downloads.open-mesh.org/batman/releases/batman-adv-2015.1/batctl-2015.1.tar.gz.sha1
-sha1	ae086f334ff912ab2a8116caedf0a2a1816acf1a	batctl-2015.1.tar.gz
+# From https://downloads.open-mesh.org/batman/releases/batman-adv-2017.0/batctl-2017.0.tar.gz.sha1
+sha1 0fbc329b56b465fa4f674cfecd7348144609f8e5  batctl-2017.0.tar.gz
 # Locally calculated
-sha256	ea67ee22785e6fcd5149472bdf2df4e9f21716968e025e7dd41556a010a8d14a	batctl-2015.1.tar.gz
+sha256 c0bb1127d6070b46abeb8d6a63d1150d71fa85f87f9a846873b649a21934c686  batctl-2017.0.tar.gz

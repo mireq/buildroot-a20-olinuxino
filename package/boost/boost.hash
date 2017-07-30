@@ -1,3 +1,2 @@
-# From http://sourceforge.net/projects/boost/files/boost/1.60.0/
-md5	65a840e1a0b13a558ff19eeb2c4f0cbe	boost_1_60_0.tar.bz2
-sha1	7f56ab507d3258610391b47fef6b11635861175a	boost_1_60_0.tar.bz2
+# From http://www.boost.org/users/history/version_1_64_0.html
+sha256 7bcc5caace97baa948931d712ea5f37038dbb1c5d89b43ad4def4ed7cb683332  boost_1_64_0.tar.bz2
